@@ -1,0 +1,1239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0A0E1A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Braincast">
+<meta name="description" content="Braincast – Your daily knowledge brief">
+<title>Braincast – Know More</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+/* ═══════════════════════════════════════
+   BRAINCAST V3 — DESIGN SYSTEM
+   Navy: #0A0E1A | Gold: #E8D5A3
+   Playfair Display + DM Sans
+═══════════════════════════════════════ */
+
+:root {
+  --navy:         #0A0E1A;
+  --navy-mid:     #111827;
+  --navy-card:    #141C2E;
+  --navy-border:  #1E2A42;
+  --gold:         #E8D5A3;
+  --gold-bright:  #F5E6C0;
+  --gold-dim:     #C4A96A;
+  --gold-muted:   #8A7240;
+  --white:        #F0EDE8;
+  --text-mid:     #A8B4C8;
+  --text-dim:     #8892A4;
+  --red:          #E05252;
+  --green:        #4CAF82;
+  --radius-card:  16px;
+  --radius-pill:  20px;
+  --nav-height:   72px;
+  --top-height:   62px;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--navy);
+  color: var(--white);
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+  max-width: 430px;
+  margin: 0 auto;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── TOPBAR ─── */
+.topbar {
+  position: fixed;
+  top:0; left:50%; transform:translateX(-50%);
+  width:100%; max-width:430px;
+  z-index: 200;
+  background: rgba(10,14,26,0.93);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-bottom: 1px solid var(--navy-border);
+  padding: 14px 20px 12px;
+  display: flex; align-items:center; justify-content:space-between;
+}
+
+.logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px; font-weight: 700;
+  color: var(--gold);
+  letter-spacing: 0.5px;
+}
+.logo-beta {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px; color: var(--text-dim);
+  font-style: italic; margin-left: 5px;
+}
+
+.topbar-right { display:flex; align-items:center; gap:10px; }
+
+.icon-btn {
+  width:36px; height:36px; border-radius:10px;
+  background: var(--navy-card);
+  border: 1px solid var(--navy-border);
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; font-size:15px;
+  transition: border-color 0.2s;
+  user-select: none;
+}
+.icon-btn:hover { border-color: var(--gold-muted); }
+.icon-btn:active { opacity: 0.7; }
+
+/* ─── MAIN CONTENT ─── */
+.main {
+  padding-top: var(--top-height);
+  padding-bottom: var(--nav-height);
+  min-height: 100vh;
+}
+
+/* ─── TAB SYSTEM ─── */
+.tab-content { display:none; }
+.tab-content.active { display:block; animation: tabIn 0.22s ease; }
+@keyframes tabIn {
+  from { opacity:0; transform:translateY(7px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+/* ─── BOTTOM NAV ─── */
+.bottom-nav {
+  position: fixed;
+  bottom:0; left:50%; transform:translateX(-50%);
+  width:100%; max-width:430px;
+  height: var(--nav-height);
+  background: rgba(10,14,26,0.96);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--navy-border);
+  display: flex; z-index:200;
+  padding: 6px 0 14px;
+}
+
+.nav-item {
+  flex:1; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:4px;
+  cursor:pointer; padding:4px 0;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.nav-icon  { font-size:20px; line-height:1; transition: transform 0.15s; }
+.nav-label {
+  font-size:10px; font-weight:500;
+  color: var(--text-dim); letter-spacing:0.3px;
+  transition: color 0.2s;
+}
+.nav-item.active .nav-label { color: var(--gold); }
+.nav-item.active .nav-icon  { filter: drop-shadow(0 0 5px rgba(232,213,163,0.55)); transform: scale(1.08); }
+.nav-item:active .nav-icon  { transform: scale(0.92); }
+
+/* ─── SHARED COMPONENTS ─── */
+.section-label {
+  padding: 16px 20px 8px;
+  font-size:10px; font-weight:600;
+  color: var(--text-dim);
+  text-transform:uppercase; letter-spacing:1.1px;
+}
+.section-head {
+  display:flex; align-items:center; justify-content:space-between;
+  padding: 14px 20px 8px;
+}
+.section-head-title {
+  font-family:'Playfair Display',serif;
+  font-size:18px; font-weight:600;
+}
+.section-head-action {
+  font-size:12px; color:var(--gold-dim);
+  font-weight:500; cursor:pointer;
+}
+
+.gold-divider {
+  height:1px;
+  background: linear-gradient(90deg, transparent, var(--navy-border), transparent);
+  margin: 6px 20px;
+}
+
+/* Page header */
+.page-header { padding: 20px 20px 10px; }
+.page-greeting {
+  font-size:11px; color:var(--text-dim);
+  text-transform:uppercase; letter-spacing:0.8px; margin-bottom:4px;
+}
+.page-title {
+  font-family:'Playfair Display',serif;
+  font-size:26px; font-weight:700; line-height:1.2;
+}
+.page-title em {
+  color: var(--gold); font-style:italic;
+}
+.page-subtitle { font-size:13px; color:var(--text-dim); margin-top:5px; line-height:1.5; }
+
+/* ─── PILLS ─── */
+.pills-scroll {
+  display:flex; gap:8px;
+  padding: 10px 20px 14px;
+  overflow-x:auto; scrollbar-width:none;
+}
+.pills-scroll::-webkit-scrollbar { display:none; }
+.pill {
+  flex-shrink:0; padding:7px 16px; border-radius:var(--radius-pill);
+  font-size:12px; font-weight:500; cursor:pointer; white-space:nowrap;
+  border:1px solid var(--navy-border);
+  color:var(--text-mid); background:var(--navy-card);
+  transition: all 0.18s;
+  user-select:none;
+}
+.pill.active {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--navy);
+  font-weight:600;
+}
+.pill:active { opacity:0.8; }
+
+/* ─── NEWS CARDS ─── */
+.news-list { padding:0 16px; display:flex; flex-direction:column; gap:12px; }
+
+.news-card {
+  background: var(--navy-card);
+  border:1px solid var(--navy-border);
+  border-radius:var(--radius-card); overflow:hidden;
+  cursor:pointer; position:relative;
+  transition: border-color 0.2s, transform 0.15s;
+}
+.news-card:active { transform: scale(0.985); }
+.news-card:hover  { border-color: var(--gold-muted); }
+
+/* Featured card top accent */
+.news-card.featured {
+  background: linear-gradient(150deg, #141C2E 0%, #0F1628 100%);
+  border-color: var(--gold-muted);
+}
+.news-card.featured::before {
+  content:'';
+  position:absolute; top:0; left:0; right:0; height:2px;
+  background: linear-gradient(90deg, var(--gold-dim), transparent);
+}
+
+.card-img {
+  width:100%; height:158px;
+  background: linear-gradient(135deg, #1A2440, #0D1525);
+  display:flex; align-items:center; justify-content:center;
+  font-size:44px;
+  border-bottom:1px solid var(--navy-border);
+}
+
+.card-body { padding:14px 16px 16px; }
+
+.card-meta { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+.card-source {
+  font-size:10px; font-weight:700; letter-spacing:0.5px;
+  color:var(--gold-dim); text-transform:uppercase;
+}
+.card-dot { width:3px; height:3px; border-radius:50%; background:var(--text-dim); }
+.card-time { font-size:10px; color:var(--text-dim); }
+
+.card-title {
+  font-family:'Playfair Display',serif;
+  font-size:17px; font-weight:600; line-height:1.35;
+  color:var(--white); margin-bottom:8px;
+}
+.card-summary {
+  font-size:13px; color:var(--text-mid); line-height:1.65;
+  display:-webkit-box; -webkit-line-clamp:2;
+  -webkit-box-orient:vertical; overflow:hidden;
+}
+
+.card-footer {
+  display:flex; align-items:center; justify-content:space-between;
+  margin-top:12px; padding-top:12px;
+  border-top:1px solid var(--navy-border);
+}
+.card-tag {
+  font-size:10px; font-weight:500; padding:3px 9px; border-radius:10px;
+  background: rgba(232,213,163,0.08); color:var(--gold-dim);
+  border:1px solid rgba(232,213,163,0.12);
+}
+.card-actions { display:flex; align-items:center; gap:10px; }
+.card-action { font-size:16px; cursor:pointer; opacity:0.45; transition:opacity 0.2s; }
+.card-action:hover { opacity:1; }
+
+.listen-btn {
+  display:flex; align-items:center; gap:5px;
+  padding:5px 11px; border-radius:var(--radius-pill);
+  background: rgba(232,213,163,0.09);
+  border:1px solid rgba(232,213,163,0.2);
+  color:var(--gold); font-size:11px; font-weight:500;
+  cursor:pointer; transition:background 0.2s;
+  user-select:none;
+}
+.listen-btn:hover { background: rgba(232,213,163,0.16); }
+.listen-btn:active { opacity:0.8; }
+
+/* Mini card (horizontal) */
+.card-mini {
+  display:flex; align-items:center; gap:12px;
+  background:var(--navy-card); border:1px solid var(--navy-border);
+  border-radius:14px; padding:14px; cursor:pointer;
+  transition: border-color 0.2s, transform 0.15s;
+}
+.card-mini:active { transform:scale(0.985); }
+.card-mini:hover  { border-color:var(--gold-muted); }
+.mini-emoji { font-size:28px; flex-shrink:0; }
+.mini-body  { flex:1; min-width:0; }
+.mini-title {
+  font-family:'Playfair Display',serif;
+  font-size:14px; font-weight:600; line-height:1.35;
+  color:var(--white); margin-bottom:4px;
+  display:-webkit-box; -webkit-line-clamp:2;
+  -webkit-box-orient:vertical; overflow:hidden;
+}
+.mini-meta { font-size:11px; color:var(--text-dim); }
+
+/* ─── SEARCH BAR ─── */
+.search-wrap { padding:0 20px 14px; }
+.search-bar {
+  display:flex; align-items:center; gap:10px;
+  background:var(--navy-card); border:1px solid var(--navy-border);
+  border-radius:14px; padding:11px 16px;
+  transition: border-color 0.2s;
+}
+.search-bar:focus-within { border-color:var(--gold-muted); }
+.search-bar input {
+  flex:1; background:none; border:none; outline:none;
+  color:var(--white); font-family:'DM Sans',sans-serif; font-size:14px;
+}
+.search-bar input::placeholder { color:var(--text-dim); }
+.search-icon { font-size:15px; opacity:0.4; }
+
+/* ─── TOPIC GRID ─── */
+.topic-grid {
+  display:grid; grid-template-columns:1fr 1fr;
+  gap:10px; padding:0 16px;
+}
+.topic-card {
+  border-radius:var(--radius-card); padding:18px 16px;
+  cursor:pointer; min-height:105px;
+  display:flex; flex-direction:column; justify-content:flex-end;
+  transition:transform 0.15s; position:relative; overflow:hidden;
+  user-select:none;
+}
+.topic-card:active { transform:scale(0.96); }
+.topic-card.span-2 {
+  grid-column:span 2; min-height:72px;
+  flex-direction:row; align-items:center; justify-content:space-between;
+}
+.topic-emoji { font-size:30px; margin-bottom:8px; }
+.topic-name  { font-family:'Playfair Display',serif; font-size:15px; font-weight:600; color:#fff; }
+.topic-count { font-size:10px; margin-top:2px; color:rgba(255,255,255,0.55); }
+
+.tc-world   { background:linear-gradient(145deg,#0E2030,#071525); border:1px solid #1A3A50; }
+.tc-tech    { background:linear-gradient(145deg,#1E0E30,#110720); border:1px solid #3A1A50; }
+.tc-biz     { background:linear-gradient(145deg,#0E2010,#071508); border:1px solid #1A3A1A; }
+.tc-sci     { background:linear-gradient(145deg,#2A1A08,#1A1005); border:1px solid #4A3010; }
+.tc-pol     { background:linear-gradient(145deg,#0E0E28,#080818); border:1px solid #1A1A40; }
+.tc-health  { background:linear-gradient(145deg,#280E0E,#180808); border:1px solid #401A1A; }
+.tc-india   { background:linear-gradient(145deg,#181408,#100E04); border:1px solid var(--gold-muted); }
+.tc-india .topic-name  { color:var(--gold); font-size:17px; }
+.tc-india .topic-count { color:var(--gold-dim); opacity:1; }
+
+/* ─── TRENDING LIST ─── */
+.trending-list { padding:0 16px; }
+.trending-item {
+  display:flex; align-items:center; gap:12px;
+  padding:13px 0; border-bottom:1px solid var(--navy-border);
+  cursor:pointer;
+}
+.trending-item:last-child { border-bottom:none; }
+.trend-num  { font-size:17px; font-weight:700; color:var(--gold-dim); min-width:26px; }
+.trend-body { flex:1; }
+.trend-text { font-size:14px; font-weight:500; color:var(--white); margin-bottom:2px; }
+.trend-sub  { font-size:11px; color:var(--text-dim); }
+.trend-arr  { font-size:16px; color:var(--text-dim); }
+
+/* ─── MONITOR CARDS ─── */
+.monitor-card {
+  margin:0 16px 12px;
+  background:var(--navy-card); border:1px solid var(--navy-border);
+  border-radius:var(--radius-card); padding:16px;
+  transition: border-color 0.2s;
+}
+.monitor-card:hover { border-color:var(--gold-muted); }
+.monitor-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+.monitor-keyword { font-family:'Playfair Display',serif; font-size:16px; font-weight:600; }
+.monitor-badge {
+  background:rgba(232,213,163,0.1); border:1px solid rgba(232,213,163,0.22);
+  color:var(--gold); font-size:11px; font-weight:600;
+  padding:3px 10px; border-radius:10px;
+}
+.monitor-preview { font-size:13px; color:var(--text-mid); line-height:1.6; margin-bottom:8px; }
+.monitor-meta    { font-size:11px; color:var(--text-dim); }
+
+.add-btn {
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  margin:0 16px 16px; padding:14px;
+  background:rgba(232,213,163,0.05);
+  border:1px dashed rgba(232,213,163,0.25);
+  border-radius:var(--radius-card);
+  color:var(--gold); font-size:14px; font-weight:500;
+  cursor:pointer; transition:all 0.2s; user-select:none;
+}
+.add-btn:hover { background:rgba(232,213,163,0.1); border-style:solid; }
+.add-btn:active { opacity:0.8; }
+
+/* Suggestion chips */
+.chip-wrap { padding:0 16px; display:flex; flex-wrap:wrap; gap:8px; margin-bottom:20px; }
+.chip {
+  padding:7px 13px; border-radius:var(--radius-pill);
+  background:var(--navy-card); border:1px solid var(--navy-border);
+  color:var(--text-mid); font-size:12px; cursor:pointer;
+  transition:all 0.18s; user-select:none;
+}
+.chip:hover { border-color:var(--gold-muted); color:var(--gold); }
+.chip:active { opacity:0.8; }
+
+/* ─── ASK AI ─── */
+.mode-toggle {
+  display:flex; margin:14px 16px;
+  background:var(--navy-card); border:1px solid var(--navy-border);
+  border-radius:14px; padding:4px; gap:4px;
+}
+.mode-btn {
+  flex:1; padding:10px; border-radius:10px;
+  font-size:13px; font-weight:500; cursor:pointer;
+  text-align:center; color:var(--text-dim);
+  display:flex; align-items:center; justify-content:center; gap:6px;
+  transition:all 0.2s; user-select:none;
+}
+.mode-btn.active {
+  background:var(--gold); color:var(--navy); font-weight:700;
+}
+.mode-btn:active { opacity:0.85; }
+
+/* Chat messages */
+.chat-area {
+  padding:0 16px; display:flex; flex-direction:column;
+  gap:12px; margin-bottom:14px;
+}
+.ai-label {
+  font-size:10px; color:var(--gold-dim); font-weight:600;
+  letter-spacing:0.5px; margin-bottom:5px; text-transform:uppercase;
+}
+.bubble {
+  max-width:86%; padding:12px 15px;
+  border-radius:16px; font-size:14px; line-height:1.65;
+}
+.bubble.ai {
+  background:var(--navy-card); border:1px solid var(--navy-border);
+  color:var(--white); border-bottom-left-radius:4px; align-self:flex-start;
+}
+.bubble.user {
+  background:var(--gold); color:var(--navy);
+  border-bottom-right-radius:4px; align-self:flex-end; font-weight:500;
+}
+
+/* Typing indicator */
+.typing { display:flex; gap:4px; padding:3px 0; align-items:center; }
+.typing-dot {
+  width:6px; height:6px; border-radius:50%; background:var(--gold-dim);
+  animation: bounce 1.2s infinite;
+}
+.typing-dot:nth-child(2) { animation-delay:0.2s; }
+.typing-dot:nth-child(3) { animation-delay:0.4s; }
+@keyframes bounce {
+  0%,60%,100% { transform:translateY(0); opacity:0.35; }
+  30% { transform:translateY(-5px); opacity:1; }
+}
+
+/* Quick prompts */
+.quick-prompts { padding:0 16px; display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
+.quick-chip {
+  padding:7px 13px; border-radius:var(--radius-pill);
+  background:var(--navy-card); border:1px solid var(--navy-border);
+  color:var(--text-mid); font-size:12px; cursor:pointer;
+  transition:all 0.18s; user-select:none;
+}
+.quick-chip:hover { border-color:var(--gold-muted); color:var(--gold); }
+
+/* Chat input */
+.chat-input-row { margin:0 16px; display:flex; gap:8px; align-items:flex-end; }
+.chat-textarea {
+  flex:1; background:var(--navy-card); border:1px solid var(--navy-border);
+  border-radius:14px; padding:12px 14px;
+  color:var(--white); font-family:'DM Sans',sans-serif; font-size:14px;
+  outline:none; resize:none; min-height:48px; max-height:120px;
+  transition: border-color 0.2s; line-height:1.5;
+}
+.chat-textarea:focus { border-color:var(--gold-muted); }
+.chat-textarea::placeholder { color:var(--text-dim); }
+.send-btn {
+  width:48px; height:48px; border-radius:14px;
+  background:var(--gold); border:none;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; font-size:20px; font-weight:700;
+  color:var(--navy); flex-shrink:0;
+  transition:opacity 0.2s; user-select:none;
+}
+.send-btn:hover { opacity:0.88; }
+.send-btn:active { opacity:0.7; transform:scale(0.95); }
+
+/* ─── VIDEO MODE ─── */
+.video-wrap { padding:0 16px; }
+
+.url-card {
+  background:var(--navy-card); border:1px solid var(--navy-border);
+  border-radius:var(--radius-card); padding:16px; margin-bottom:14px;
+}
+.input-label {
+  font-size:10px; font-weight:600; color:var(--text-dim);
+  text-transform:uppercase; letter-spacing:0.6px; margin-bottom:8px;
+}
+.url-row { display:flex; gap:8px; }
+.url-input {
+  flex:1; background:var(--navy); border:1px solid var(--navy-border);
+  border-radius:10px; padding:10px 12px;
+  color:var(--white); font-family:'DM Sans',sans-serif; font-size:13px; outline:none;
+  transition: border-color 0.2s;
+}
+.url-input:focus { border-color:var(--gold-muted); }
+.url-input::placeholder { color:var(--text-dim); }
+.url-load-btn {
+  padding:10px 18px; background:var(--gold); color:var(--navy);
+  border:none; border-radius:10px; font-weight:700; font-size:13px;
+  cursor:pointer; font-family:'DM Sans',sans-serif;
+  transition:opacity 0.2s; user-select:none;
+}
+.url-load-btn:active { opacity:0.8; }
+
+/* Style & voice selectors */
+.v-section { margin-bottom:16px; }
+.style-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
+.style-chip {
+  padding:9px 6px; border-radius:10px; text-align:center;
+  background:var(--navy-card); border:1px solid var(--navy-border);
+  color:var(--text-mid); font-size:11px; font-weight:500;
+  cursor:pointer; transition:all 0.18s; user-select:none;
+}
+.style-chip.active {
+  background:rgba(232,213,163,0.1); border-color:var(--gold-dim);
+  color:var(--gold); font-weight:600;
+}
+.style-chip:active { opacity:0.8; }
+
+.voice-list { display:flex; flex-direction:column; gap:8px; }
+.voice-item {
+  display:flex; align-items:center; gap:12px;
+  padding:11px 14px; border-radius:12px;
+  background:var(--navy-card); border:1px solid var(--navy-border);
+  cursor:pointer; transition:all 0.18s; user-select:none;
+}
+.voice-item.active { border-color:var(--gold-dim); background:rgba(232,213,163,0.05); }
+.voice-dot {
+  width:8px; height:8px; border-radius:50%;
+  background:var(--navy-border); flex-shrink:0; transition:background 0.2s;
+}
+.voice-item.active .voice-dot { background:var(--gold); }
+.voice-name { font-size:13px; font-weight:500; flex:1; }
+.voice-desc { font-size:11px; color:var(--text-dim); }
+
+.generate-btn {
+  width:100%; padding:16px; margin-top:16px;
+  background:var(--gold); color:var(--navy);
+  border:none; border-radius:var(--radius-card);
+  font-family:'DM Sans',sans-serif; font-size:15px; font-weight:700;
+  cursor:pointer; letter-spacing:0.3px;
+  transition:opacity 0.2s; user-select:none;
+}
+.generate-btn:hover  { opacity:0.9; }
+.generate-btn:active { opacity:0.75; transform:scale(0.99); }
+
+/* ─── PREMIUM BANNER ─── */
+.premium-banner {
+  margin:16px 16px;
+  background:linear-gradient(145deg,#13110A,#1C1A10);
+  border:1px solid var(--gold-muted);
+  border-radius:var(--radius-card); padding:18px;
+  position:relative; overflow:hidden;
+}
+.premium-banner::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:2px;
+  background:linear-gradient(90deg, var(--gold-dim), var(--gold), var(--gold-dim));
+}
+.premium-badge {
+  display:inline-block; font-size:10px; font-weight:700;
+  text-transform:uppercase; letter-spacing:1px;
+  color:var(--navy); background:var(--gold);
+  padding:3px 10px; border-radius:10px; margin-bottom:10px;
+}
+.premium-title {
+  font-family:'Playfair Display',serif;
+  font-size:18px; font-weight:700; color:var(--gold); margin-bottom:6px;
+}
+.premium-desc { font-size:13px; color:var(--text-mid); line-height:1.6; margin-bottom:14px; }
+.premium-perks { list-style:none; margin-bottom:14px; }
+.premium-perks li {
+  font-size:12px; color:var(--text-mid); padding:3px 0;
+  display:flex; align-items:center; gap:7px;
+}
+.perk-check { color:var(--gold); font-size:12px; }
+.premium-price { margin-bottom:14px; }
+.price-amount { font-size:28px; font-weight:700; color:var(--gold); }
+.price-period { font-size:13px; color:var(--text-dim); margin-left:3px; }
+.premium-cta {
+  width:100%; padding:13px;
+  background:var(--gold); color:var(--navy);
+  border:none; border-radius:12px;
+  font-family:'DM Sans',sans-serif; font-weight:700; font-size:14px;
+  cursor:pointer; transition:opacity 0.2s; user-select:none;
+}
+.premium-cta:hover  { opacity:0.9; }
+.premium-cta:active { opacity:0.75; }
+
+/* ─── EMPTY STATE ─── */
+.empty-state {
+  padding:32px 20px; text-align:center;
+}
+.empty-icon  { font-size:40px; margin-bottom:12px; }
+.empty-title { font-family:'Playfair Display',serif; font-size:18px; margin-bottom:8px; }
+.empty-desc  { font-size:13px; color:var(--text-dim); line-height:1.6; }
+
+/* ─── TOAST ─── */
+.toast {
+  position:fixed; bottom:86px; left:50%; transform:translateX(-50%);
+  background:var(--navy-card); border:1px solid var(--navy-border);
+  color:var(--white); font-size:13px; font-weight:500;
+  padding:10px 20px; border-radius:30px; z-index:300;
+  opacity:0; pointer-events:none;
+  transition: opacity 0.3s, transform 0.3s;
+  transform: translateX(-50%) translateY(6px);
+  white-space:nowrap;
+}
+.toast.show {
+  opacity:1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ─── SCROLL SPACER ─── */
+.scroll-end { height:16px; }
+
+</style>
+</head>
+<body>
+
+<!-- ═══ TOAST ═══ -->
+<div class="toast" id="toast"></div>
+
+<!-- ═══ TOPBAR ═══ -->
+<div class="topbar">
+  <div style="display:flex;align-items:baseline;">
+    <span class="logo">Braincast</span>
+    <span class="logo-beta">beta</span>
+  </div>
+  <div class="topbar-right">
+    <div class="icon-btn" onclick="showToast('🔍 Search coming soon')">🔍</div>
+    <div class="icon-btn" onclick="showToast('👤 Profile coming soon')">👤</div>
+  </div>
+</div>
+
+<!-- ═══ MAIN ═══ -->
+<div class="main">
+
+  <!-- ════════════ FEED ════════════ -->
+  <div class="tab-content active" id="tab-feed">
+
+    <div class="page-header">
+      <div class="page-greeting" id="greeting">Good morning</div>
+      <div class="page-title">Your <em>daily</em> knowledge brief</div>
+    </div>
+
+    <!-- Category pills -->
+    <div class="pills-scroll" id="feed-pills">
+      <div class="pill active" onclick="selectPill(this,'feed-pills')">For You</div>
+      <div class="pill" onclick="selectPill(this,'feed-pills')">World</div>
+      <div class="pill" onclick="selectPill(this,'feed-pills')">Tech</div>
+      <div class="pill" onclick="selectPill(this,'feed-pills')">Science</div>
+      <div class="pill" onclick="selectPill(this,'feed-pills')">Business</div>
+      <div class="pill" onclick="selectPill(this,'feed-pills')">Health</div>
+      <div class="pill" onclick="selectPill(this,'feed-pills')">India</div>
+    </div>
+
+    <!-- News feed -->
+    <div class="news-list" id="news-feed">
+
+      <!-- FEATURED -->
+      <div class="news-card featured">
+        <div class="card-img">🌍</div>
+        <div class="card-body">
+          <div class="card-meta">
+            <span class="card-source">Reuters</span>
+            <div class="card-dot"></div>
+            <span class="card-time">2 hours ago</span>
+          </div>
+          <div class="card-title">Global AI Regulation Summit Reaches Historic Agreement on Safety Standards</div>
+          <div class="card-summary">Leaders from 40 nations gathered in Geneva signed a landmark accord establishing unified safety benchmarks for advanced AI systems, a first in international tech governance.</div>
+          <div class="card-footer">
+            <span class="card-tag">🌐 World</span>
+            <div class="card-actions">
+              <div class="listen-btn" onclick="showToast('🎧 Audio playing...')">🎧 Listen</div>
+              <div class="card-action" onclick="showToast('🔖 Saved!')">🔖</div>
+              <div class="card-action" onclick="showToast('↗️ Link copied!')">↗️</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-mini">
+        <div class="mini-emoji">🚀</div>
+        <div class="mini-body">
+          <div class="mini-title">SpaceX Starship completes first commercial payload delivery to lunar orbit</div>
+          <div class="mini-meta">Space.com · 4h ago</div>
+        </div>
+      </div>
+
+      <div class="card-mini">
+        <div class="mini-emoji">💊</div>
+        <div class="mini-body">
+          <div class="mini-title">New obesity drug shows 30% better results than existing treatments in Phase III trial</div>
+          <div class="mini-meta">Nature · 5h ago</div>
+        </div>
+      </div>
+
+      <div class="news-card">
+        <div class="card-body">
+          <div class="card-meta">
+            <span class="card-source">Bloomberg</span>
+            <div class="card-dot"></div>
+            <span class="card-time">6 hours ago</span>
+          </div>
+          <div class="card-title">India's GDP Growth Surprises Markets, Hits 8.2% in Q1 2026</div>
+          <div class="card-summary">Strong domestic consumption and record infrastructure spending powered India's economy past analyst expectations, cementing its position as the world's fastest-growing major economy.</div>
+          <div class="card-footer">
+            <span class="card-tag">📈 Business</span>
+            <div class="card-actions">
+              <div class="listen-btn" onclick="showToast('🎧 Audio playing...')">🎧 Listen</div>
+              <div class="card-action" onclick="showToast('🔖 Saved!')">🔖</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-mini">
+        <div class="mini-emoji">⚡</div>
+        <div class="mini-body">
+          <div class="mini-title">Solar panel efficiency record broken again — 47.6% achieved in lab conditions</div>
+          <div class="mini-meta">MIT Tech Review · 8h ago</div>
+        </div>
+      </div>
+
+      <div class="card-mini">
+        <div class="mini-emoji">🧠</div>
+        <div class="mini-body">
+          <div class="mini-title">Scientists map complete neural connectome of a mammalian brain for the first time</div>
+          <div class="mini-meta">Science · 9h ago</div>
+        </div>
+      </div>
+
+      <div class="news-card">
+        <div class="card-body">
+          <div class="card-meta">
+            <span class="card-source">BBC</span>
+            <div class="card-dot"></div>
+            <span class="card-time">11 hours ago</span>
+          </div>
+          <div class="card-title">Arctic Ice Sheet Records Largest Single-Year Regrowth in Three Decades</div>
+          <div class="card-summary">New satellite data shows unprecedented Arctic ice regrowth, offering cautious hope amid ongoing climate concerns. Scientists urge continued monitoring before drawing long-term conclusions.</div>
+          <div class="card-footer">
+            <span class="card-tag">🌿 Climate</span>
+            <div class="card-actions">
+              <div class="listen-btn" onclick="showToast('🎧 Audio playing...')">🎧 Listen</div>
+              <div class="card-action" onclick="showToast('🔖 Saved!')">🔖</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="scroll-end"></div>
+  </div>
+
+  <!-- ════════════ EXPLORE ════════════ -->
+  <div class="tab-content" id="tab-explore">
+
+    <div class="page-header">
+      <div class="page-title">Explore <em>Topics</em></div>
+    </div>
+
+    <div class="search-wrap">
+      <div class="search-bar">
+        <span class="search-icon">🔍</span>
+        <input type="text" placeholder="Search topics, keywords..." />
+      </div>
+    </div>
+
+    <!-- Topic grid -->
+    <div class="topic-grid">
+      <div class="topic-card tc-world"  onclick="showToast('🌏 Loading World...')">
+        <div class="topic-emoji">🌏</div>
+        <div class="topic-name">World</div>
+        <div class="topic-count">48 stories today</div>
+      </div>
+      <div class="topic-card tc-tech" onclick="showToast('🤖 Loading Tech...')">
+        <div class="topic-emoji">🤖</div>
+        <div class="topic-name">AI & Tech</div>
+        <div class="topic-count">63 stories today</div>
+      </div>
+      <div class="topic-card tc-biz" onclick="showToast('📈 Loading Business...')">
+        <div class="topic-emoji">📈</div>
+        <div class="topic-name">Business</div>
+        <div class="topic-count">29 stories today</div>
+      </div>
+      <div class="topic-card tc-sci" onclick="showToast('🔬 Loading Science...')">
+        <div class="topic-emoji">🔬</div>
+        <div class="topic-name">Science</div>
+        <div class="topic-count">22 stories today</div>
+      </div>
+      <div class="topic-card tc-pol" onclick="showToast('🏛️ Loading Politics...')">
+        <div class="topic-emoji">🏛️</div>
+        <div class="topic-name">Politics</div>
+        <div class="topic-count">37 stories today</div>
+      </div>
+      <div class="topic-card tc-health" onclick="showToast('❤️ Loading Health...')">
+        <div class="topic-emoji">❤️</div>
+        <div class="topic-name">Health</div>
+        <div class="topic-count">18 stories today</div>
+      </div>
+      <div class="topic-card tc-india span-2" onclick="showToast('🇮🇳 Loading India Focus...')">
+        <div>
+          <div class="topic-name">🇮🇳 India Focus</div>
+          <div class="topic-count">Curated Indian news · 41 stories</div>
+        </div>
+        <div style="font-size:24px; color:var(--gold-dim); margin-right:4px;">→</div>
+      </div>
+    </div>
+
+    <div class="gold-divider" style="margin-top:16px;"></div>
+
+    <div class="section-head">
+      <div class="section-head-title">🔥 Trending Now</div>
+      <div class="section-head-action">See all</div>
+    </div>
+
+    <div class="trending-list">
+      <div class="trending-item">
+        <div class="trend-num">01</div>
+        <div class="trend-body">
+          <div class="trend-text">AI Safety Summit Geneva</div>
+          <div class="trend-sub">24.3K reading · 🌐 World</div>
+        </div>
+        <div class="trend-arr">›</div>
+      </div>
+      <div class="trending-item">
+        <div class="trend-num">02</div>
+        <div class="trend-body">
+          <div class="trend-text">India GDP Q1 2026</div>
+          <div class="trend-sub">18.7K reading · 📈 Business</div>
+        </div>
+        <div class="trend-arr">›</div>
+      </div>
+      <div class="trending-item">
+        <div class="trend-num">03</div>
+        <div class="trend-body">
+          <div class="trend-text">SpaceX Lunar Delivery</div>
+          <div class="trend-sub">14.1K reading · 🚀 Space</div>
+        </div>
+        <div class="trend-arr">›</div>
+      </div>
+      <div class="trending-item">
+        <div class="trend-num">04</div>
+        <div class="trend-body">
+          <div class="trend-text">Solar Panel Efficiency Record</div>
+          <div class="trend-sub">9.8K reading · ⚡ Energy</div>
+        </div>
+        <div class="trend-arr">›</div>
+      </div>
+      <div class="trending-item">
+        <div class="trend-num">05</div>
+        <div class="trend-body">
+          <div class="trend-text">Obesity Drug Phase III Results</div>
+          <div class="trend-sub">8.4K reading · 💊 Health</div>
+        </div>
+        <div class="trend-arr">›</div>
+      </div>
+    </div>
+    <div class="scroll-end"></div>
+  </div>
+
+  <!-- ════════════ MONITOR ════════════ -->
+  <div class="tab-content" id="tab-monitor">
+
+    <div class="page-header">
+      <div class="page-title">Monitor <em>Keywords</em></div>
+      <div class="page-subtitle">Get notified when topics you care about appear in the news.</div>
+    </div>
+
+    <!-- Active monitors -->
+    <div class="monitor-card">
+      <div class="monitor-header">
+        <div class="monitor-keyword">🤖 Artificial Intelligence</div>
+        <div class="monitor-badge">12 new</div>
+      </div>
+      <div class="monitor-preview">"OpenAI releases new model with 10x reasoning improvements, sparking debate among researchers..."</div>
+      <div class="monitor-meta">Last updated · 34 min ago</div>
+    </div>
+
+    <div class="monitor-card">
+      <div class="monitor-header">
+        <div class="monitor-keyword">🇮🇳 India Economy</div>
+        <div class="monitor-badge">5 new</div>
+      </div>
+      <div class="monitor-preview">"India's GDP growth surprises markets as domestic spending surges in Q1 2026..."</div>
+      <div class="monitor-meta">Last updated · 2 hours ago</div>
+    </div>
+
+    <div class="add-btn" onclick="addMonitor()">
+      <span style="font-size:18px;">＋</span>
+      Add a keyword to monitor
+    </div>
+
+    <div class="gold-divider"></div>
+
+    <div class="section-head">
+      <div class="section-head-title">💡 Suggestions</div>
+    </div>
+
+    <div class="chip-wrap">
+      <div class="chip" onclick="showToast('📊 Added: Stock Market')">📊 Stock Market</div>
+      <div class="chip" onclick="showToast('🏛️ Added: Punjab Politics')">🏛️ Punjab Politics</div>
+      <div class="chip" onclick="showToast('💊 Added: Pharmacy')">💊 Pharmacy</div>
+      <div class="chip" onclick="showToast('🌏 Added: New Zealand')">🌏 New Zealand</div>
+      <div class="chip" onclick="showToast('⚡ Added: Renewable Energy')">⚡ Renewable Energy</div>
+      <div class="chip" onclick="showToast('🚀 Added: Space Tech')">🚀 Space Tech</div>
+    </div>
+    <div class="scroll-end"></div>
+  </div>
+
+  <!-- ════════════ ASK AI ════════════ -->
+  <div class="tab-content" id="tab-askai">
+
+    <div class="page-header">
+      <div class="page-title">Ask <em>Anything</em></div>
+    </div>
+
+    <!-- Mode toggle -->
+    <div class="mode-toggle">
+      <div class="mode-btn active" id="mode-chat" onclick="switchMode('chat')">💬 Chat</div>
+      <div class="mode-btn" id="mode-video" onclick="switchMode('video')">🎬 Video</div>
+    </div>
+
+    <!-- ── CHAT MODE ── -->
+    <div id="chat-mode">
+      <div class="chat-area" id="chat-messages">
+        <div>
+          <div class="ai-label">Braincast AI</div>
+          <div class="bubble ai">Hey! I can answer questions about today's news, explain complex topics, or help you understand anything you've read. What's on your mind?</div>
+        </div>
+      </div>
+
+      <div class="quick-prompts">
+        <div class="quick-chip" onclick="sendPrompt(this)">Explain the AI safety summit</div>
+        <div class="quick-chip" onclick="sendPrompt(this)">Why is India's GDP growing fast?</div>
+        <div class="quick-chip" onclick="sendPrompt(this)">Top 3 stories today</div>
+        <div class="quick-chip" onclick="sendPrompt(this)">What is a neural connectome?</div>
+      </div>
+
+      <div class="chat-input-row">
+        <textarea
+          class="chat-textarea"
+          id="chat-input"
+          placeholder="Ask anything about today's news..."
+          rows="1"
+          oninput="autoResize(this)"
+          onkeydown="handleEnter(event)"
+        ></textarea>
+        <button class="send-btn" onclick="sendChat()">↑</button>
+      </div>
+    </div>
+
+    <!-- ── VIDEO MODE ── -->
+    <div id="video-mode" style="display:none;">
+      <div class="video-wrap">
+
+        <div class="url-card">
+          <div class="input-label">📺 YouTube Video URL</div>
+          <div class="url-row">
+            <input class="url-input" type="url" placeholder="Paste YouTube link here..." />
+            <button class="url-load-btn" onclick="showToast('📺 Loading video...')">Load</button>
+          </div>
+        </div>
+
+        <div class="v-section">
+          <div class="input-label" style="margin-bottom:8px;">📝 Explanation Style</div>
+          <div class="style-grid" id="style-grid">
+            <div class="style-chip active"  onclick="selectStyle(this)">Full Transcript</div>
+            <div class="style-chip" onclick="selectStyle(this)">Clean Summary</div>
+            <div class="style-chip" onclick="selectStyle(this)">Study Notes</div>
+            <div class="style-chip" onclick="selectStyle(this)">ELI5</div>
+            <div class="style-chip" onclick="selectStyle(this)">Key Lessons</div>
+            <div class="style-chip" onclick="selectStyle(this)">Tweet Version</div>
+          </div>
+        </div>
+
+        <div class="v-section">
+          <div class="input-label" style="margin-bottom:8px;">🎙️ Voice</div>
+          <div class="voice-list" id="voice-list">
+            <div class="voice-item active" onclick="selectVoice(this)">
+              <div class="voice-dot"></div>
+              <div class="voice-name">Calm Teacher</div>
+              <div class="voice-desc">Clear & measured</div>
+            </div>
+            <div class="voice-item" onclick="selectVoice(this)">
+              <div class="voice-dot"></div>
+              <div class="voice-name">Podcast Host</div>
+              <div class="voice-desc">Warm & conversational</div>
+            </div>
+            <div class="voice-item" onclick="selectVoice(this)">
+              <div class="voice-dot"></div>
+              <div class="voice-name">News Anchor</div>
+              <div class="voice-desc">Crisp & authoritative</div>
+            </div>
+            <div class="voice-item" onclick="selectVoice(this)">
+              <div class="voice-dot"></div>
+              <div class="voice-name">Friend Explaining</div>
+              <div class="voice-desc">Casual & relatable</div>
+            </div>
+            <div class="voice-item" onclick="selectVoice(this)">
+              <div class="voice-dot"></div>
+              <div class="voice-name">Energetic Coach</div>
+              <div class="voice-desc">Upbeat & motivating</div>
+            </div>
+          </div>
+        </div>
+
+        <button class="generate-btn" onclick="showToast('✨ Generating your Braincast...')">✨ Generate Braincast</button>
+      </div>
+
+      <!-- Premium -->
+      <div class="premium-banner">
+        <div class="premium-badge">Premium</div>
+        <div class="premium-title">Unlock Full Power</div>
+        <div class="premium-desc">Everything you need to learn smarter — at less than a coffee a month.</div>
+        <ul class="premium-perks">
+          <li><span class="perk-check">✦</span> Unlimited video transcriptions</li>
+          <li><span class="perk-check">✦</span> PDF study notes download</li>
+          <li><span class="perk-check">✦</span> Priority AI responses</li>
+          <li><span class="perk-check">✦</span> No ads, ever</li>
+        </ul>
+        <div class="premium-price">
+          <span class="price-amount">$4.99</span>
+          <span class="price-period">/ month</span>
+        </div>
+        <button class="premium-cta" onclick="showToast('🌟 Redirecting to checkout...')">Upgrade Now — Cancel Anytime</button>
+      </div>
+      <div class="scroll-end"></div>
+    </div>
+
+  </div>
+  <!-- end tabs -->
+
+</div>
+<!-- end main -->
+
+<!-- ═══ BOTTOM NAV ═══ -->
+<div class="bottom-nav">
+  <div class="nav-item active" id="nav-feed"    onclick="switchTab('feed')">
+    <div class="nav-icon">📰</div>
+    <div class="nav-label">Feed</div>
+  </div>
+  <div class="nav-item" id="nav-explore"  onclick="switchTab('explore')">
+    <div class="nav-icon">🧭</div>
+    <div class="nav-label">Explore</div>
+  </div>
+  <div class="nav-item" id="nav-monitor"  onclick="switchTab('monitor')">
+    <div class="nav-icon">📡</div>
+    <div class="nav-label">Monitor</div>
+  </div>
+  <div class="nav-item" id="nav-askai"    onclick="switchTab('askai')">
+    <div class="nav-icon">✨</div>
+    <div class="nav-label">Ask AI</div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════
+   BRAINCAST V3 — APP LOGIC
+   Clean, ready for backend swap
+═══════════════════════════════ */
+
+// ── Greeting based on time ──
+(function setGreeting() {
+  const h = new Date().getHours();
+  const el = document.getElementById('greeting');
+  if (!el) return;
+  if (h < 12) el.textContent = 'Good morning';
+  else if (h < 17) el.textContent = 'Good afternoon';
+  else el.textContent = 'Good evening';
+})();
+
+// ── Tab switching ──
+function switchTab(tab) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  document.getElementById('nav-' + tab).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── Pill selection ──
+function selectPill(el, groupId) {
+  const group = document.getElementById(groupId);
+  group.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ── Mode toggle (Chat / Video) ──
+function switchMode(mode) {
+  document.getElementById('mode-chat').classList.toggle('active', mode === 'chat');
+  document.getElementById('mode-video').classList.toggle('active', mode === 'video');
+  document.getElementById('chat-mode').style.display  = mode === 'chat'  ? 'block' : 'none';
+  document.getElementById('video-mode').style.display = mode === 'video' ? 'block' : 'none';
+}
+
+// ── Style chip selection ──
+function selectStyle(el) {
+  document.querySelectorAll('#style-grid .style-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ── Voice selection ──
+function selectVoice(el) {
+  document.querySelectorAll('#voice-list .voice-item').forEach(v => v.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ── Auto-resize textarea ──
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
+// ── Enter to send ──
+function handleEnter(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendChat();
+  }
+}
+
+// ── Send from quick prompt chips ──
+function sendPrompt(el) {
+  document.getElementById('chat-input').value = el.textContent.trim();
+  sendChat();
+}
+
+// ── AI response map (replace with real API call later) ──
+const AI_RESPONSES = {
+  'ai safety summit':
+    'The AI Safety Summit in Geneva brought together leaders from 40 nations who signed a landmark accord on unified safety benchmarks for AI. Think of it as the first "Geneva Convention for AI." Key commitments: mandatory risk assessments before releasing powerful models, shared incident reporting, and a joint international monitoring body.',
+  "india's gdp":
+    "India's 8.2% GDP growth in Q1 2026 is powered by three engines:\n\n1️⃣ Record government infrastructure spend (roads, railways, digital India)\n2️⃣ Strong domestic consumption — India's middle class is expanding fast\n3️⃣ Booming services sector, especially IT and financial services\n\nGlobal supply chain shifts away from China are also a tailwind.",
+  'top 3 stories':
+    "Today's top 3 stories:\n\n🌍 AI Safety Summit Geneva — 40 nations sign historic AI safety accord\n📈 India GDP hits 8.2% in Q1 2026, beating all market forecasts\n🚀 SpaceX Starship completes first commercial lunar orbit delivery",
+  'neural connectome':
+    "A neural connectome is a complete map of every synaptic connection in a brain — essentially the brain's full wiring diagram.\n\nScientists just completed one for a mammal for the very first time. This helps us understand memory, cognition, and neurological disease at the circuit level. For scale: the human brain has ~100 trillion synapses, so a full human connectome is still decades away.",
+};
+
+// ── Chat send ──
+async function sendChat() {
+  const input  = document.getElementById('chat-input');
+  const text   = input.value.trim();
+  if (!text) return;
+
+  const feed = document.getElementById('chat-messages');
+
+  // User bubble
+  appendBubble(feed, 'user', text);
+  input.value = '';
+  input.style.height = 'auto';
+
+  // Typing indicator
+  const typingEl = appendTyping(feed);
+  feed.scrollTop = feed.scrollHeight;
+
+  // Simulate API delay (replace with real fetch later)
+  await delay(1200);
+
+  // Find response
+  const key = text.toLowerCase();
+  let reply = "Great question! Braincast pulls from 50+ trusted RSS sources to give you real-time context on anything in the news. Try asking about a specific story from today's feed.";
+  for (const [k, v] of Object.entries(AI_RESPONSES)) {
+    if (key.includes(k)) { reply = v; break; }
+  }
+
+  typingEl.remove();
+  appendBubble(feed, 'ai', reply);
+  feed.scrollTop = feed.scrollHeight;
+}
+
+function appendBubble(container, type, text) {
+  const wrap = document.createElement('div');
+  if (type === 'user') {
+    wrap.style.cssText = 'display:flex;justify-content:flex-end;';
+    wrap.innerHTML = `<div class="bubble user">${escHtml(text)}</div>`;
+  } else {
+    wrap.innerHTML = `<div class="ai-label">Braincast AI</div>
+      <div class="bubble ai">${text.replace(/\n/g, '<br>')}</div>`;
+  }
+  container.appendChild(wrap);
+}
+
+function appendTyping(container) {
+  const wrap = document.createElement('div');
+  wrap.innerHTML = `<div class="ai-label">Braincast AI</div>
+    <div class="bubble ai"><div class="typing">
+      <div class="typing-dot"></div>
+      <div class="typing-dot"></div>
+      <div class="typing-dot"></div>
+    </div></div>`;
+  container.appendChild(wrap);
+  return wrap;
+}
+
+// ── Monitor: Add keyword ──
+function addMonitor() {
+  const kw = prompt('Enter a keyword or topic to monitor:');
+  if (kw && kw.trim()) {
+    showToast(`📡 Now monitoring: "${kw.trim()}"`);
+  }
+}
+
+// ── Toast notification ──
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ── Helpers ──
+function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+</script>
+</body>
+</html>
