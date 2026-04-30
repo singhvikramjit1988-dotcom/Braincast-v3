@@ -1025,26 +1025,15 @@ body {
 // Each source has a category tag
 // ══════════════════════════════
 const RSS_SOURCES = [
-  { url:'https://feeds.bbci.co.uk/news/world/rss.xml',              cat:'world',    label:'BBC World',      emoji:'🌍' },
-  { url:'https://feeds.bbci.co.uk/news/technology/rss.xml',         cat:'tech',     label:'BBC Tech',       emoji:'🤖' },
-  { url:'https://feeds.bbci.co.uk/news/science_and_environment/rss.xml', cat:'science', label:'BBC Science', emoji:'🔬' },
-  { url:'https://feeds.bbci.co.uk/news/health/rss.xml',             cat:'health',   label:'BBC Health',     emoji:'💊' },
-  { url:'https://feeds.bbci.co.uk/news/business/rss.xml',           cat:'business', label:'BBC Business',   emoji:'📈' },
-  { url:'https://timesofindia.indiatimes.com/rssfeeds/1221656.cms', cat:'india',    label:'Times of India', emoji:'🇮🇳' },
-  { url:'https://feeds.feedburner.com/ndtvnews-india-news',         cat:'india',    label:'NDTV India',     emoji:'🇮🇳' },
-  { url:'https://rss.nytimes.com/services/xml/rss/nyt/World.xml',   cat:'world',    label:'NYT World',      emoji:'🗞️' },
-  { url:'https://rss.nytimes.com/services/xml/rss/nyt/Technology.xml', cat:'tech',  label:'NYT Tech',       emoji:'💻' },
-  { url:'https://www.theguardian.com/world/rss',                    cat:'world',    label:'Guardian',       emoji:'🌐' },
+  { url:'https://news.google.com/rss/search?q=world+news&hl=en-IN&gl=IN&ceid=IN:en',     cat:'world',    label:'Google News',    emoji:'🌍' },
+  { url:'https://news.google.com/rss/search?q=technology+AI&hl=en-IN&gl=IN&ceid=IN:en',  cat:'tech',     label:'Google News',    emoji:'🤖' },
+  { url:'https://news.google.com/rss/search?q=science&hl=en-IN&gl=IN&ceid=IN:en',        cat:'science',  label:'Google News',    emoji:'🔬' },
+  { url:'https://news.google.com/rss/search?q=health+medicine&hl=en-IN&gl=IN&ceid=IN:en',cat:'health',   label:'Google News',    emoji:'💊' },
+  { url:'https://news.google.com/rss/search?q=business+economy&hl=en-IN&gl=IN&ceid=IN:en',cat:'business',label:'Google News',   emoji:'📈' },
+  { url:'https://news.google.com/rss/search?q=india+news&hl=en-IN&gl=IN&ceid=IN:en',     cat:'india',    label:'Google News',    emoji:'🇮🇳' },
 ];
 
-// Multiple CORS proxies — try each until one works
-const PROXIES = [
-  url => `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}&count=8`,
-  url => `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,
-  url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
-];
-
-// Store all fetched articles
+// ── Parse raw XML into articles ──
 let allArticles = [];
 let currentCat  = 'all';
 
@@ -1082,42 +1071,17 @@ function parseXML(xmlText, source) {
   } catch(e) { return []; }
 }
 
-// ── Fetch one feed via rss2json (primary) ──
-async function fetchViaRss2json(source) {
-  const res  = await fetch(PROXIES[0](source.url), { signal: AbortSignal.timeout(7000) });
-  const data = await res.json();
-  if (data.status !== 'ok' || !data.items?.length) throw new Error('empty');
-  return data.items.map(item => ({
-    title:   item.title || '',
-    summary: (item.description || '').replace(/<[^>]+>/g,'').slice(0,200),
-    url:     item.link || '#',
-    time:    item.pubDate || '',
-    source:  source.label,
-    cat:     source.cat,
-    emoji:   source.emoji,
-  }));
-}
-
-// ── Fetch via allorigins (fallback — returns raw XML) ──
-async function fetchViaAllOrigins(source) {
-  const res  = await fetch(PROXIES[1](source.url), { signal: AbortSignal.timeout(7000) });
-  const data = await res.json();
-  return parseXML(data.contents, source);
-}
-
-// ── Fetch via corsproxy (second fallback — returns raw XML) ──
-async function fetchViaCorsProxy(source) {
-  const res  = await fetch(PROXIES[2](source.url), { signal: AbortSignal.timeout(7000) });
-  const text = await res.text();
-  return parseXML(text, source);
-}
-
-// ── Fetch one source with fallbacks ──
+// ── Fetch one feed via allorigins CORS proxy ──
 async function fetchFeed(source) {
-  try { const r = await fetchViaRss2json(source);  if (r.length) return r; } catch(e) {}
-  try { const r = await fetchViaAllOrigins(source); if (r.length) return r; } catch(e) {}
-  try { const r = await fetchViaCorsProxy(source);  if (r.length) return r; } catch(e) {}
-  return [];
+  try {
+    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(source.url)}`;
+    const res  = await fetch(proxyUrl, { signal: AbortSignal.timeout(10000) });
+    const data = await res.json();
+    if (!data.contents) return [];
+    return parseXML(data.contents, source);
+  } catch(e) {
+    return [];
+  }
 }
 
 // ── Load all feeds ──
@@ -1129,34 +1093,16 @@ async function loadFeed() {
       <div class="loading-text">Fetching latest news...</div>
     </div>`;
 
-  // Fetch first 5 sources — faster load, less chance of all failing
-  const prioritySources = RSS_SOURCES.slice(0, 5);
-  const results = await Promise.allSettled(prioritySources.map(fetchFeed));
+  const results = await Promise.allSettled(RSS_SOURCES.map(fetchFeed));
   allArticles = [];
   results.forEach(r => { if (r.status === 'fulfilled') allArticles.push(...r.value); });
-
-  // Sort newest first
   allArticles.sort((a,b) => new Date(b.time) - new Date(a.time));
 
   if (allArticles.length === 0) {
     showFeedError(container);
-    // Silently try remaining sources
-    const restResults = await Promise.allSettled(RSS_SOURCES.slice(5).map(fetchFeed));
-    restResults.forEach(r => { if (r.status === 'fulfilled') allArticles.push(...r.value); });
-    if (allArticles.length > 0) {
-      allArticles.sort((a,b) => new Date(b.time) - new Date(a.time));
-      renderFeed(container, allArticles);
-    }
     return;
   }
-
   renderFeed(container, allArticles);
-
-  // Load remaining sources in background
-  Promise.allSettled(RSS_SOURCES.slice(5).map(fetchFeed)).then(rest => {
-    rest.forEach(r => { if (r.status === 'fulfilled') allArticles.push(...r.value); });
-    allArticles.sort((a,b) => new Date(b.time) - new Date(a.time));
-  });
 }
 
 // ── Render articles ──
