@@ -657,8 +657,104 @@ body {
   cursor:pointer; font-family:'DM Sans',sans-serif;
 }
 
-/* ─── PILL ACTIVE FILTER ─── */
-.pill[data-cat].active { background:var(--gold); border-color:var(--gold); color:var(--navy); }
+/* ─── IN-APP READER ─── */
+.reader-overlay {
+  position:fixed; inset:0;
+  background:rgba(0,0,0,0.55);
+  backdrop-filter:blur(4px);
+  -webkit-backdrop-filter:blur(4px);
+  z-index:400;
+  opacity:0; pointer-events:none;
+  transition:opacity 0.3s;
+}
+.reader-overlay.open { opacity:1; pointer-events:all; }
+
+.reader-panel {
+  position:fixed; bottom:0; left:50%;
+  transform:translateX(-50%) translateY(100%);
+  width:100%; max-width:430px;
+  height:88vh;
+  background:var(--navy);
+  border-radius:24px 24px 0 0;
+  border-top:1px solid var(--navy-border);
+  z-index:401;
+  transition:transform 0.4s cubic-bezier(0.32,0.72,0,1);
+  display:flex; flex-direction:column; overflow:hidden;
+}
+.reader-panel.open { transform:translateX(-50%) translateY(0); }
+
+.reader-handle {
+  display:flex; justify-content:center;
+  padding:12px 0 6px; flex-shrink:0;
+}
+.handle-bar {
+  width:36px; height:4px; border-radius:2px;
+  background:var(--navy-border);
+}
+
+.reader-topbar {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:4px 16px 12px; flex-shrink:0;
+  border-bottom:1px solid var(--navy-border);
+}
+.reader-source-label {
+  font-size:11px; font-weight:700;
+  color:var(--gold-dim); text-transform:uppercase; letter-spacing:0.5px;
+}
+.reader-top-actions { display:flex; gap:8px; }
+.reader-action-btn {
+  width:34px; height:34px; border-radius:10px;
+  background:var(--navy-card); border:1px solid var(--navy-border);
+  display:flex; align-items:center; justify-content:center;
+  font-size:15px; cursor:pointer; user-select:none;
+  transition:border-color 0.2s;
+}
+.reader-action-btn:hover { border-color:var(--gold-muted); }
+.reader-action-btn:active { opacity:0.7; }
+
+.reader-body {
+  flex:1; overflow-y:auto; padding:20px 20px 32px;
+  -webkit-overflow-scrolling:touch;
+}
+.reader-body::-webkit-scrollbar { display:none; }
+
+.reader-cat-tag {
+  display:inline-block; font-size:10px; font-weight:600;
+  padding:3px 10px; border-radius:10px;
+  background:rgba(232,213,163,0.08); color:var(--gold-dim);
+  border:1px solid rgba(232,213,163,0.15);
+  margin-bottom:14px;
+}
+.reader-title {
+  font-family:'Playfair Display',serif;
+  font-size:22px; font-weight:700; line-height:1.32;
+  color:var(--white); margin-bottom:14px;
+}
+.reader-meta {
+  display:flex; align-items:center; gap:8px;
+  font-size:11px; color:var(--text-dim);
+  margin-bottom:18px; padding-bottom:16px;
+  border-bottom:1px solid var(--navy-border);
+  flex-wrap:wrap;
+}
+.reader-meta-dot { width:3px; height:3px; border-radius:50%; background:var(--navy-border); }
+
+.reader-content {
+  font-size:15px; color:var(--text-mid);
+  line-height:1.85; margin-bottom:28px;
+}
+
+.reader-full-btn {
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  width:100%; padding:15px;
+  background:var(--gold); color:var(--navy);
+  border:none; border-radius:14px;
+  font-family:'DM Sans',sans-serif;
+  font-size:14px; font-weight:700;
+  cursor:pointer; user-select:none;
+  transition:opacity 0.2s;
+}
+.reader-full-btn:active { opacity:0.8; }
 
 </style>
 </head>
@@ -993,6 +1089,33 @@ body {
 </div>
 <!-- end main -->
 
+<!-- ═══ IN-APP READER ═══ -->
+<div class="reader-overlay" id="readerOverlay" onclick="closeReader()"></div>
+<div class="reader-panel" id="readerPanel">
+  <div class="reader-handle"><div class="handle-bar"></div></div>
+  <div class="reader-topbar">
+    <div class="reader-source-label" id="readerSource">Source</div>
+    <div class="reader-top-actions">
+      <div class="reader-action-btn" onclick="saveCurrentArticle()">🔖</div>
+      <div class="reader-action-btn" onclick="shareCurrentArticle()">↗️</div>
+      <div class="reader-action-btn" onclick="closeReader()">✕</div>
+    </div>
+  </div>
+  <div class="reader-body">
+    <div class="reader-cat-tag" id="readerTag">Category</div>
+    <div class="reader-title" id="readerTitle">Title</div>
+    <div class="reader-meta">
+      <span id="readerSourceMeta"></span>
+      <div class="reader-meta-dot"></div>
+      <span id="readerTime"></span>
+    </div>
+    <div class="reader-content" id="readerContent"></div>
+    <button class="reader-full-btn" id="readerFullBtn" onclick="openFullArticle()">
+      🔗 Read full article
+    </button>
+  </div>
+</div>
+
 <!-- ═══ BOTTOM NAV ═══ -->
 <div class="bottom-nav">
   <div class="nav-item active" id="nav-feed"    onclick="switchTab('feed')">
@@ -1104,6 +1227,7 @@ async function loadFeed() {
 
   // Show fallback articles instantly — no waiting
   allArticles = [...FALLBACK_ARTICLES];
+  displayedArticles = [...allArticles];
   renderFeed(container, allArticles);
 
   // Try to get live RSS in background — upgrade feed if successful
@@ -1136,19 +1260,16 @@ function renderFeed(container, articles) {
 
   let html = '';
   articles.forEach((a, i) => {
-    const time    = a.time ? timeAgo(a.time) : '';
-    const summary = a.summary.trim();
+    const time     = a.time ? timeAgo(a.time) : '';
+    const summary  = a.summary ? a.summary.trim() : '';
     const catEmoji = CAT_EMOJI[a.cat] || '📰';
     const catLabel = a.cat.charAt(0).toUpperCase() + a.cat.slice(1);
-    const safeTitle = escHtml(a.title);
-    const safeSummary = escHtml(summary);
-    const safeSource  = escHtml(a.source);
-    const safeUrl     = escHtml(a.url);
+    const safeTitle  = escHtml(a.title);
+    const safeSource = escHtml(a.source);
 
     if (i === 0) {
-      // Featured card
       html += `
-        <div class="news-card featured" onclick="openArticle('${safeUrl}')">
+        <div class="news-card featured" onclick="openArticle(${i})">
           <div class="card-img">${a.emoji}</div>
           <div class="card-body">
             <div class="card-meta">
@@ -1157,21 +1278,20 @@ function renderFeed(container, articles) {
               <span class="card-time">${time}</span>
             </div>
             <div class="card-title">${safeTitle}</div>
-            ${safeSummary ? `<div class="card-summary">${safeSummary}</div>` : ''}
+            ${summary ? `<div class="card-summary">${escHtml(summary)}</div>` : ''}
             <div class="card-footer">
               <span class="card-tag">${catEmoji} ${catLabel}</span>
               <div class="card-actions">
                 <div class="listen-btn" onclick="event.stopPropagation();showToast('🎧 Audio coming soon')">🎧 Listen</div>
-                <div class="card-action" onclick="event.stopPropagation();saveArticle('${safeTitle}')">🔖</div>
-                <div class="card-action" onclick="event.stopPropagation();copyLink('${safeUrl}')">↗️</div>
+                <div class="card-action" onclick="event.stopPropagation();openArticle(${i})">🔖</div>
+                <div class="card-action" onclick="event.stopPropagation();openArticle(${i})">↗️</div>
               </div>
             </div>
           </div>
         </div>`;
     } else if (i % 3 === 0) {
-      // Full card every 3rd
       html += `
-        <div class="news-card" onclick="openArticle('${safeUrl}')">
+        <div class="news-card" onclick="openArticle(${i})">
           <div class="card-body">
             <div class="card-meta">
               <span class="card-source">${safeSource}</span>
@@ -1179,20 +1299,19 @@ function renderFeed(container, articles) {
               <span class="card-time">${time}</span>
             </div>
             <div class="card-title">${safeTitle}</div>
-            ${safeSummary ? `<div class="card-summary">${safeSummary}</div>` : ''}
+            ${summary ? `<div class="card-summary">${escHtml(summary)}</div>` : ''}
             <div class="card-footer">
               <span class="card-tag">${catEmoji} ${catLabel}</span>
               <div class="card-actions">
                 <div class="listen-btn" onclick="event.stopPropagation();showToast('🎧 Audio coming soon')">🎧 Listen</div>
-                <div class="card-action" onclick="event.stopPropagation();saveArticle('${safeTitle}')">🔖</div>
+                <div class="card-action" onclick="event.stopPropagation();openArticle(${i})">🔖</div>
               </div>
             </div>
           </div>
         </div>`;
     } else {
-      // Mini card
       html += `
-        <div class="card-mini" onclick="openArticle('${safeUrl}')">
+        <div class="card-mini" onclick="openArticle(${i})">
           <div class="mini-emoji">${a.emoji}</div>
           <div class="mini-body">
             <div class="mini-title">${safeTitle}</div>
@@ -1206,31 +1325,65 @@ function renderFeed(container, articles) {
 }
 
 // ── Filter by category pill ──
+let displayedArticles = [];
 function filterFeed(cat, el) {
   document.querySelectorAll('#feed-pills .pill').forEach(p => p.classList.remove('active'));
   el.classList.add('active');
   currentCat = cat;
   const container = document.getElementById('news-feed');
-  const filtered  = cat === 'all' ? allArticles : allArticles.filter(a => a.cat === cat);
-  renderFeed(container, filtered);
+  displayedArticles = cat === 'all' ? allArticles : allArticles.filter(a => a.cat === cat);
+  renderFeed(container, displayedArticles);
 }
 
-// ── Open article ──
-function openArticle(url) {
-  if (url && url !== '#') window.open(url, '_blank');
+// ── Current article for reader ──
+let currentArticle = null;
+
+// ── Open in-app reader ──
+function openArticle(index) {
+  const list = displayedArticles.length ? displayedArticles : allArticles;
+  const a = list[index];
+  if (!a) return;
+  currentArticle = a;
+
+  const catLabel = a.cat.charAt(0).toUpperCase() + a.cat.slice(1);
+  const catEmoji = CAT_EMOJI[a.cat] || '📰';
+
+  document.getElementById('readerSource').textContent      = a.source;
+  document.getElementById('readerTag').textContent         = catEmoji + ' ' + catLabel;
+  document.getElementById('readerTitle').textContent       = a.title;
+  document.getElementById('readerSourceMeta').textContent  = a.source;
+  document.getElementById('readerTime').textContent        = a.time ? timeAgo(a.time) : '';
+  document.getElementById('readerContent').textContent     = a.summary || 'No summary available for this article.';
+  document.getElementById('readerFullBtn').textContent     = '🔗 Read full article on ' + a.source;
+
+  document.getElementById('readerOverlay').classList.add('open');
+  document.getElementById('readerPanel').classList.add('open');
+  document.body.style.overflow = 'hidden';
 }
 
-// ── Save article ──
-function saveArticle(title) {
-  showToast('🔖 Saved: ' + title.slice(0,30) + '...');
+function closeReader() {
+  document.getElementById('readerOverlay').classList.remove('open');
+  document.getElementById('readerPanel').classList.remove('open');
+  document.body.style.overflow = '';
 }
 
-// ── Copy link ──
-function copyLink(url) {
-  if (navigator.clipboard) {
-    navigator.clipboard.writeText(url).then(() => showToast('↗️ Link copied!'));
-  } else {
-    showToast('↗️ Link copied!');
+function openFullArticle() {
+  if (currentArticle?.url && currentArticle.url !== '#') {
+    window.open(currentArticle.url, '_blank');
+  }
+}
+
+function saveCurrentArticle() {
+  if (currentArticle) showToast('🔖 Saved: ' + currentArticle.title.slice(0,30) + '...');
+}
+
+function shareCurrentArticle() {
+  if (currentArticle?.url) {
+    if (navigator.share) {
+      navigator.share({ title: currentArticle.title, url: currentArticle.url });
+    } else if (navigator.clipboard) {
+      navigator.clipboard.writeText(currentArticle.url).then(() => showToast('↗️ Link copied!'));
+    }
   }
 }
 
