@@ -1037,8 +1037,12 @@ const RSS_SOURCES = [
   { url:'https://www.theguardian.com/world/rss',                    cat:'world',    label:'Guardian',       emoji:'🌐' },
 ];
 
-// CORS proxy — rss2json converts RSS to JSON
-const RSS2JSON = 'https://api.rss2json.com/v1/api.json?rss_url=';
+// Multiple CORS proxies — try each until one works
+const PROXIES = [
+  url => `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}&count=8`,
+  url => `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,
+  url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+];
 
 // Store all fetched articles
 let allArticles = [];
@@ -1059,37 +1063,75 @@ function timeAgo(dateStr) {
   return Math.floor(diff/86400) + 'd ago';
 }
 
-// ── Fetch one RSS feed ──
-async function fetchFeed(source) {
+// ── Parse raw XML into articles ──
+function parseXML(xmlText, source) {
   try {
-    const res  = await fetch(RSS2JSON + encodeURIComponent(source.url) + '&count=6');
-    const data = await res.json();
-    if (data.status !== 'ok' || !data.items) return [];
-    return data.items.map(item => ({
-      title:   item.title || '',
-      summary: item.description ? item.description.replace(/<[^>]+>/g,'').slice(0,180) : '',
-      url:     item.link || '#',
-      time:    item.pubDate || '',
+    const parser = new DOMParser();
+    const doc    = parser.parseFromString(xmlText, 'text/xml');
+    const items  = Array.from(doc.querySelectorAll('item')).slice(0, 8);
+    return items.map(item => ({
+      title:   item.querySelector('title')?.textContent || '',
+      summary: (item.querySelector('description')?.textContent || '')
+                 .replace(/<[^>]+>/g,'').slice(0,200),
+      url:     item.querySelector('link')?.textContent || '#',
+      time:    item.querySelector('pubDate')?.textContent || '',
       source:  source.label,
       cat:     source.cat,
       emoji:   source.emoji,
     }));
-  } catch(e) {
-    return [];
-  }
+  } catch(e) { return []; }
+}
+
+// ── Fetch one feed via rss2json (primary) ──
+async function fetchViaRss2json(source) {
+  const res  = await fetch(PROXIES[0](source.url), { signal: AbortSignal.timeout(7000) });
+  const data = await res.json();
+  if (data.status !== 'ok' || !data.items?.length) throw new Error('empty');
+  return data.items.map(item => ({
+    title:   item.title || '',
+    summary: (item.description || '').replace(/<[^>]+>/g,'').slice(0,200),
+    url:     item.link || '#',
+    time:    item.pubDate || '',
+    source:  source.label,
+    cat:     source.cat,
+    emoji:   source.emoji,
+  }));
+}
+
+// ── Fetch via allorigins (fallback — returns raw XML) ──
+async function fetchViaAllOrigins(source) {
+  const res  = await fetch(PROXIES[1](source.url), { signal: AbortSignal.timeout(7000) });
+  const data = await res.json();
+  return parseXML(data.contents, source);
+}
+
+// ── Fetch via corsproxy (second fallback — returns raw XML) ──
+async function fetchViaCorsProxy(source) {
+  const res  = await fetch(PROXIES[2](source.url), { signal: AbortSignal.timeout(7000) });
+  const text = await res.text();
+  return parseXML(text, source);
+}
+
+// ── Fetch one source with fallbacks ──
+async function fetchFeed(source) {
+  try { const r = await fetchViaRss2json(source);  if (r.length) return r; } catch(e) {}
+  try { const r = await fetchViaAllOrigins(source); if (r.length) return r; } catch(e) {}
+  try { const r = await fetchViaCorsProxy(source);  if (r.length) return r; } catch(e) {}
+  return [];
 }
 
 // ── Load all feeds ──
 async function loadFeed() {
   const container = document.getElementById('news-feed');
   container.innerHTML = `
-    <div class="feed-loading" id="feed-loading">
+    <div class="feed-loading">
       <div class="loading-spinner"></div>
       <div class="loading-text">Fetching latest news...</div>
     </div>`;
 
-  // Fetch all sources in parallel
-  const results = await Promise.allSettled(RSS_SOURCES.map(fetchFeed));
+  // Fetch first 5 sources — faster load, less chance of all failing
+  const prioritySources = RSS_SOURCES.slice(0, 5);
+  const results = await Promise.allSettled(prioritySources.map(fetchFeed));
   allArticles = [];
   results.forEach(r => { if (r.status === 'fulfilled') allArticles.push(...r.value); });
 
@@ -1098,10 +1140,23 @@ async function loadFeed() {
 
   if (allArticles.length === 0) {
     showFeedError(container);
+    // Silently try remaining sources
+    const restResults = await Promise.allSettled(RSS_SOURCES.slice(5).map(fetchFeed));
+    restResults.forEach(r => { if (r.status === 'fulfilled') allArticles.push(...r.value); });
+    if (allArticles.length > 0) {
+      allArticles.sort((a,b) => new Date(b.time) - new Date(a.time));
+      renderFeed(container, allArticles);
+    }
     return;
   }
 
   renderFeed(container, allArticles);
+
+  // Load remaining sources in background
+  Promise.allSettled(RSS_SOURCES.slice(5).map(fetchFeed)).then(rest => {
+    rest.forEach(r => { if (r.status === 'fulfilled') allArticles.push(...r.value); });
+    allArticles.sort((a,b) => new Date(b.time) - new Date(a.time));
+  });
 }
 
 // ── Render articles ──
