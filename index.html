@@ -628,6 +628,38 @@ body {
 /* ─── SCROLL SPACER ─── */
 .scroll-end { height:16px; }
 
+/* ─── FEED LOADING ─── */
+.feed-loading {
+  display:flex; flex-direction:column; align-items:center;
+  padding:48px 20px; gap:14px;
+}
+.loading-spinner {
+  width:32px; height:32px;
+  border:2px solid var(--navy-border);
+  border-top-color:var(--gold);
+  border-radius:50%;
+  animation: spin 0.75s linear infinite;
+}
+@keyframes spin { to { transform:rotate(360deg); } }
+.loading-text { font-size:13px; color:var(--text-dim); }
+
+/* ─── FEED ERROR ─── */
+.feed-error {
+  margin:16px; padding:20px;
+  background:var(--navy-card); border:1px solid var(--navy-border);
+  border-radius:var(--radius-card); text-align:center;
+}
+.feed-error-icon { font-size:32px; margin-bottom:10px; }
+.feed-error-msg  { font-size:13px; color:var(--text-dim); line-height:1.6; margin-bottom:14px; }
+.feed-retry-btn  {
+  padding:9px 22px; background:var(--gold); color:var(--navy);
+  border:none; border-radius:10px; font-weight:700; font-size:13px;
+  cursor:pointer; font-family:'DM Sans',sans-serif;
+}
+
+/* ─── PILL ACTIVE FILTER ─── */
+.pill[data-cat].active { background:var(--gold); border-color:var(--gold); color:var(--navy); }
+
 </style>
 </head>
 <body>
@@ -660,110 +692,21 @@ body {
 
     <!-- Category pills -->
     <div class="pills-scroll" id="feed-pills">
-      <div class="pill active" onclick="selectPill(this,'feed-pills')">For You</div>
-      <div class="pill" onclick="selectPill(this,'feed-pills')">World</div>
-      <div class="pill" onclick="selectPill(this,'feed-pills')">Tech</div>
-      <div class="pill" onclick="selectPill(this,'feed-pills')">Science</div>
-      <div class="pill" onclick="selectPill(this,'feed-pills')">Business</div>
-      <div class="pill" onclick="selectPill(this,'feed-pills')">Health</div>
-      <div class="pill" onclick="selectPill(this,'feed-pills')">India</div>
+      <div class="pill active" data-cat="all"      onclick="filterFeed('all',this)">For You</div>
+      <div class="pill"        data-cat="world"    onclick="filterFeed('world',this)">World</div>
+      <div class="pill"        data-cat="tech"     onclick="filterFeed('tech',this)">Tech</div>
+      <div class="pill"        data-cat="science"  onclick="filterFeed('science',this)">Science</div>
+      <div class="pill"        data-cat="business" onclick="filterFeed('business',this)">Business</div>
+      <div class="pill"        data-cat="health"   onclick="filterFeed('health',this)">Health</div>
+      <div class="pill"        data-cat="india"    onclick="filterFeed('india',this)">India</div>
     </div>
 
     <!-- News feed -->
     <div class="news-list" id="news-feed">
-
-      <!-- FEATURED -->
-      <div class="news-card featured">
-        <div class="card-img">🌍</div>
-        <div class="card-body">
-          <div class="card-meta">
-            <span class="card-source">Reuters</span>
-            <div class="card-dot"></div>
-            <span class="card-time">2 hours ago</span>
-          </div>
-          <div class="card-title">Global AI Regulation Summit Reaches Historic Agreement on Safety Standards</div>
-          <div class="card-summary">Leaders from 40 nations gathered in Geneva signed a landmark accord establishing unified safety benchmarks for advanced AI systems, a first in international tech governance.</div>
-          <div class="card-footer">
-            <span class="card-tag">🌐 World</span>
-            <div class="card-actions">
-              <div class="listen-btn" onclick="showToast('🎧 Audio playing...')">🎧 Listen</div>
-              <div class="card-action" onclick="showToast('🔖 Saved!')">🔖</div>
-              <div class="card-action" onclick="showToast('↗️ Link copied!')">↗️</div>
-            </div>
-          </div>
-        </div>
+      <div class="feed-loading" id="feed-loading">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Fetching latest news...</div>
       </div>
-
-      <div class="card-mini">
-        <div class="mini-emoji">🚀</div>
-        <div class="mini-body">
-          <div class="mini-title">SpaceX Starship completes first commercial payload delivery to lunar orbit</div>
-          <div class="mini-meta">Space.com · 4h ago</div>
-        </div>
-      </div>
-
-      <div class="card-mini">
-        <div class="mini-emoji">💊</div>
-        <div class="mini-body">
-          <div class="mini-title">New obesity drug shows 30% better results than existing treatments in Phase III trial</div>
-          <div class="mini-meta">Nature · 5h ago</div>
-        </div>
-      </div>
-
-      <div class="news-card">
-        <div class="card-body">
-          <div class="card-meta">
-            <span class="card-source">Bloomberg</span>
-            <div class="card-dot"></div>
-            <span class="card-time">6 hours ago</span>
-          </div>
-          <div class="card-title">India's GDP Growth Surprises Markets, Hits 8.2% in Q1 2026</div>
-          <div class="card-summary">Strong domestic consumption and record infrastructure spending powered India's economy past analyst expectations, cementing its position as the world's fastest-growing major economy.</div>
-          <div class="card-footer">
-            <span class="card-tag">📈 Business</span>
-            <div class="card-actions">
-              <div class="listen-btn" onclick="showToast('🎧 Audio playing...')">🎧 Listen</div>
-              <div class="card-action" onclick="showToast('🔖 Saved!')">🔖</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="card-mini">
-        <div class="mini-emoji">⚡</div>
-        <div class="mini-body">
-          <div class="mini-title">Solar panel efficiency record broken again — 47.6% achieved in lab conditions</div>
-          <div class="mini-meta">MIT Tech Review · 8h ago</div>
-        </div>
-      </div>
-
-      <div class="card-mini">
-        <div class="mini-emoji">🧠</div>
-        <div class="mini-body">
-          <div class="mini-title">Scientists map complete neural connectome of a mammalian brain for the first time</div>
-          <div class="mini-meta">Science · 9h ago</div>
-        </div>
-      </div>
-
-      <div class="news-card">
-        <div class="card-body">
-          <div class="card-meta">
-            <span class="card-source">BBC</span>
-            <div class="card-dot"></div>
-            <span class="card-time">11 hours ago</span>
-          </div>
-          <div class="card-title">Arctic Ice Sheet Records Largest Single-Year Regrowth in Three Decades</div>
-          <div class="card-summary">New satellite data shows unprecedented Arctic ice regrowth, offering cautious hope amid ongoing climate concerns. Scientists urge continued monitoring before drawing long-term conclusions.</div>
-          <div class="card-footer">
-            <span class="card-tag">🌿 Climate</span>
-            <div class="card-actions">
-              <div class="listen-btn" onclick="showToast('🎧 Audio playing...')">🎧 Listen</div>
-              <div class="card-action" onclick="showToast('🔖 Saved!')">🔖</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
     </div>
     <div class="scroll-end"></div>
   </div>
@@ -1071,14 +1014,222 @@ body {
 </div>
 
 <script>
-/* ═══════════════════════════════
+/* ═══════════════════════════════════════
    BRAINCAST V3 — APP LOGIC
-   Clean, ready for backend swap
-═══════════════════════════════ */
+   Feed: Real RSS via rss2json API
+   Chat: Placeholder (real AI next session)
+═══════════════════════════════════════ */
 
-// ── Greeting based on time ──
+// ══════════════════════════════
+// RSS FEED CONFIG
+// Each source has a category tag
+// ══════════════════════════════
+const RSS_SOURCES = [
+  { url:'https://feeds.bbci.co.uk/news/world/rss.xml',              cat:'world',    label:'BBC World',      emoji:'🌍' },
+  { url:'https://feeds.bbci.co.uk/news/technology/rss.xml',         cat:'tech',     label:'BBC Tech',       emoji:'🤖' },
+  { url:'https://feeds.bbci.co.uk/news/science_and_environment/rss.xml', cat:'science', label:'BBC Science', emoji:'🔬' },
+  { url:'https://feeds.bbci.co.uk/news/health/rss.xml',             cat:'health',   label:'BBC Health',     emoji:'💊' },
+  { url:'https://feeds.bbci.co.uk/news/business/rss.xml',           cat:'business', label:'BBC Business',   emoji:'📈' },
+  { url:'https://timesofindia.indiatimes.com/rssfeeds/1221656.cms', cat:'india',    label:'Times of India', emoji:'🇮🇳' },
+  { url:'https://feeds.feedburner.com/ndtvnews-india-news',         cat:'india',    label:'NDTV India',     emoji:'🇮🇳' },
+  { url:'https://rss.nytimes.com/services/xml/rss/nyt/World.xml',   cat:'world',    label:'NYT World',      emoji:'🗞️' },
+  { url:'https://rss.nytimes.com/services/xml/rss/nyt/Technology.xml', cat:'tech',  label:'NYT Tech',       emoji:'💻' },
+  { url:'https://www.theguardian.com/world/rss',                    cat:'world',    label:'Guardian',       emoji:'🌐' },
+];
+
+// CORS proxy — rss2json converts RSS to JSON
+const RSS2JSON = 'https://api.rss2json.com/v1/api.json?rss_url=';
+
+// Store all fetched articles
+let allArticles = [];
+let currentCat  = 'all';
+
+// Category emoji map
+const CAT_EMOJI = {
+  world:'🌍', tech:'🤖', science:'🔬', health:'💊',
+  business:'📈', india:'🇮🇳', all:'📰'
+};
+
+// ── Time formatting ──
+function timeAgo(dateStr) {
+  const diff = (Date.now() - new Date(dateStr)) / 1000;
+  if (diff < 60)   return 'just now';
+  if (diff < 3600) return Math.floor(diff/60) + 'm ago';
+  if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
+  return Math.floor(diff/86400) + 'd ago';
+}
+
+// ── Fetch one RSS feed ──
+async function fetchFeed(source) {
+  try {
+    const res  = await fetch(RSS2JSON + encodeURIComponent(source.url) + '&count=6');
+    const data = await res.json();
+    if (data.status !== 'ok' || !data.items) return [];
+    return data.items.map(item => ({
+      title:   item.title || '',
+      summary: item.description ? item.description.replace(/<[^>]+>/g,'').slice(0,180) : '',
+      url:     item.link || '#',
+      time:    item.pubDate || '',
+      source:  source.label,
+      cat:     source.cat,
+      emoji:   source.emoji,
+    }));
+  } catch(e) {
+    return [];
+  }
+}
+
+// ── Load all feeds ──
+async function loadFeed() {
+  const container = document.getElementById('news-feed');
+  container.innerHTML = `
+    <div class="feed-loading" id="feed-loading">
+      <div class="loading-spinner"></div>
+      <div class="loading-text">Fetching latest news...</div>
+    </div>`;
+
+  // Fetch all sources in parallel
+  const results = await Promise.allSettled(RSS_SOURCES.map(fetchFeed));
+  allArticles = [];
+  results.forEach(r => { if (r.status === 'fulfilled') allArticles.push(...r.value); });
+
+  // Sort newest first
+  allArticles.sort((a,b) => new Date(b.time) - new Date(a.time));
+
+  if (allArticles.length === 0) {
+    showFeedError(container);
+    return;
+  }
+
+  renderFeed(container, allArticles);
+}
+
+// ── Render articles ──
+function renderFeed(container, articles) {
+  if (!articles.length) {
+    container.innerHTML = `
+      <div class="feed-error">
+        <div class="feed-error-icon">📭</div>
+        <div class="feed-error-msg">No stories in this category right now.<br>Check back soon.</div>
+      </div>`;
+    return;
+  }
+
+  let html = '';
+  articles.forEach((a, i) => {
+    const time    = a.time ? timeAgo(a.time) : '';
+    const summary = a.summary.trim();
+    const catEmoji = CAT_EMOJI[a.cat] || '📰';
+    const catLabel = a.cat.charAt(0).toUpperCase() + a.cat.slice(1);
+    const safeTitle = escHtml(a.title);
+    const safeSummary = escHtml(summary);
+    const safeSource  = escHtml(a.source);
+    const safeUrl     = escHtml(a.url);
+
+    if (i === 0) {
+      // Featured card
+      html += `
+        <div class="news-card featured" onclick="openArticle('${safeUrl}')">
+          <div class="card-img">${a.emoji}</div>
+          <div class="card-body">
+            <div class="card-meta">
+              <span class="card-source">${safeSource}</span>
+              <div class="card-dot"></div>
+              <span class="card-time">${time}</span>
+            </div>
+            <div class="card-title">${safeTitle}</div>
+            ${safeSummary ? `<div class="card-summary">${safeSummary}</div>` : ''}
+            <div class="card-footer">
+              <span class="card-tag">${catEmoji} ${catLabel}</span>
+              <div class="card-actions">
+                <div class="listen-btn" onclick="event.stopPropagation();showToast('🎧 Audio coming soon')">🎧 Listen</div>
+                <div class="card-action" onclick="event.stopPropagation();saveArticle('${safeTitle}')">🔖</div>
+                <div class="card-action" onclick="event.stopPropagation();copyLink('${safeUrl}')">↗️</div>
+              </div>
+            </div>
+          </div>
+        </div>`;
+    } else if (i % 3 === 0) {
+      // Full card every 3rd
+      html += `
+        <div class="news-card" onclick="openArticle('${safeUrl}')">
+          <div class="card-body">
+            <div class="card-meta">
+              <span class="card-source">${safeSource}</span>
+              <div class="card-dot"></div>
+              <span class="card-time">${time}</span>
+            </div>
+            <div class="card-title">${safeTitle}</div>
+            ${safeSummary ? `<div class="card-summary">${safeSummary}</div>` : ''}
+            <div class="card-footer">
+              <span class="card-tag">${catEmoji} ${catLabel}</span>
+              <div class="card-actions">
+                <div class="listen-btn" onclick="event.stopPropagation();showToast('🎧 Audio coming soon')">🎧 Listen</div>
+                <div class="card-action" onclick="event.stopPropagation();saveArticle('${safeTitle}')">🔖</div>
+              </div>
+            </div>
+          </div>
+        </div>`;
+    } else {
+      // Mini card
+      html += `
+        <div class="card-mini" onclick="openArticle('${safeUrl}')">
+          <div class="mini-emoji">${a.emoji}</div>
+          <div class="mini-body">
+            <div class="mini-title">${safeTitle}</div>
+            <div class="mini-meta">${safeSource} · ${time}</div>
+          </div>
+        </div>`;
+    }
+  });
+
+  container.innerHTML = html;
+}
+
+// ── Filter by category pill ──
+function filterFeed(cat, el) {
+  document.querySelectorAll('#feed-pills .pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  currentCat = cat;
+  const container = document.getElementById('news-feed');
+  const filtered  = cat === 'all' ? allArticles : allArticles.filter(a => a.cat === cat);
+  renderFeed(container, filtered);
+}
+
+// ── Open article ──
+function openArticle(url) {
+  if (url && url !== '#') window.open(url, '_blank');
+}
+
+// ── Save article ──
+function saveArticle(title) {
+  showToast('🔖 Saved: ' + title.slice(0,30) + '...');
+}
+
+// ── Copy link ──
+function copyLink(url) {
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(url).then(() => showToast('↗️ Link copied!'));
+  } else {
+    showToast('↗️ Link copied!');
+  }
+}
+
+// ── Feed error state ──
+function showFeedError(container) {
+  container.innerHTML = `
+    <div class="feed-error">
+      <div class="feed-error-icon">📡</div>
+      <div class="feed-error-msg">Couldn't load the feed right now.<br>Check your connection and try again.</div>
+      <button class="feed-retry-btn" onclick="loadFeed()">Retry</button>
+    </div>`;
+}
+
+// ══════════════════════════════
+// GREETING
+// ══════════════════════════════
 (function setGreeting() {
-  const h = new Date().getHours();
+  const h  = new Date().getHours();
   const el = document.getElementById('greeting');
   if (!el) return;
   if (h < 12) el.textContent = 'Good morning';
@@ -1086,7 +1237,9 @@ body {
   else el.textContent = 'Good evening';
 })();
 
-// ── Tab switching ──
+// ══════════════════════════════
+// TAB SWITCHING
+// ══════════════════════════════
 function switchTab(tab) {
   document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -1095,14 +1248,18 @@ function switchTab(tab) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// ── Pill selection ──
+// ══════════════════════════════
+// PILL SELECTION (generic)
+// ══════════════════════════════
 function selectPill(el, groupId) {
   const group = document.getElementById(groupId);
   group.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
   el.classList.add('active');
 }
 
-// ── Mode toggle (Chat / Video) ──
+// ══════════════════════════════
+// ASK AI — MODE TOGGLE
+// ══════════════════════════════
 function switchMode(mode) {
   document.getElementById('mode-chat').classList.toggle('active', mode === 'chat');
   document.getElementById('mode-video').classList.toggle('active', mode === 'video');
@@ -1110,78 +1267,51 @@ function switchMode(mode) {
   document.getElementById('video-mode').style.display = mode === 'video' ? 'block' : 'none';
 }
 
-// ── Style chip selection ──
 function selectStyle(el) {
   document.querySelectorAll('#style-grid .style-chip').forEach(c => c.classList.remove('active'));
   el.classList.add('active');
 }
 
-// ── Voice selection ──
 function selectVoice(el) {
   document.querySelectorAll('#voice-list .voice-item').forEach(v => v.classList.remove('active'));
   el.classList.add('active');
 }
 
-// ── Auto-resize textarea ──
 function autoResize(el) {
   el.style.height = 'auto';
   el.style.height = Math.min(el.scrollHeight, 120) + 'px';
 }
 
-// ── Enter to send ──
 function handleEnter(e) {
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault();
-    sendChat();
-  }
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(); }
 }
 
-// ── Send from quick prompt chips ──
 function sendPrompt(el) {
   document.getElementById('chat-input').value = el.textContent.trim();
   sendChat();
 }
 
-// ── AI response map (replace with real API call later) ──
-const AI_RESPONSES = {
-  'ai safety summit':
-    'The AI Safety Summit in Geneva brought together leaders from 40 nations who signed a landmark accord on unified safety benchmarks for AI. Think of it as the first "Geneva Convention for AI." Key commitments: mandatory risk assessments before releasing powerful models, shared incident reporting, and a joint international monitoring body.',
-  "india's gdp":
-    "India's 8.2% GDP growth in Q1 2026 is powered by three engines:\n\n1️⃣ Record government infrastructure spend (roads, railways, digital India)\n2️⃣ Strong domestic consumption — India's middle class is expanding fast\n3️⃣ Booming services sector, especially IT and financial services\n\nGlobal supply chain shifts away from China are also a tailwind.",
-  'top 3 stories':
-    "Today's top 3 stories:\n\n🌍 AI Safety Summit Geneva — 40 nations sign historic AI safety accord\n📈 India GDP hits 8.2% in Q1 2026, beating all market forecasts\n🚀 SpaceX Starship completes first commercial lunar orbit delivery",
-  'neural connectome':
-    "A neural connectome is a complete map of every synaptic connection in a brain — essentially the brain's full wiring diagram.\n\nScientists just completed one for a mammal for the very first time. This helps us understand memory, cognition, and neurological disease at the circuit level. For scale: the human brain has ~100 trillion synapses, so a full human connectome is still decades away.",
-};
-
-// ── Chat send ──
+// ── Chat (placeholder — real Claude API next session) ──
 async function sendChat() {
-  const input  = document.getElementById('chat-input');
-  const text   = input.value.trim();
+  const input = document.getElementById('chat-input');
+  const text  = input.value.trim();
   if (!text) return;
 
   const feed = document.getElementById('chat-messages');
-
-  // User bubble
   appendBubble(feed, 'user', text);
-  input.value = '';
-  input.style.height = 'auto';
+  input.value = ''; input.style.height = 'auto';
 
-  // Typing indicator
   const typingEl = appendTyping(feed);
   feed.scrollTop = feed.scrollHeight;
 
-  // Simulate API delay (replace with real fetch later)
-  await delay(1200);
-
-  // Find response
-  const key = text.toLowerCase();
-  let reply = "Great question! Braincast pulls from 50+ trusted RSS sources to give you real-time context on anything in the news. Try asking about a specific story from today's feed.";
-  for (const [k, v] of Object.entries(AI_RESPONSES)) {
-    if (key.includes(k)) { reply = v; break; }
-  }
-
+  await delay(1100);
   typingEl.remove();
+
+  const recentHeadlines = allArticles.slice(0,5).map(a => `• ${a.title}`).join('\n');
+  const reply = recentHeadlines
+    ? `Here are the latest headlines from your feed:\n\n${recentHeadlines}\n\nAsk me about any of these stories for a deeper explanation.`
+    : "I'm connected to your live news feed. Ask me about any topic and I'll explain it in context. (Full AI answers powered by Claude coming soon!)";
+
   appendBubble(feed, 'ai', reply);
   feed.scrollTop = feed.scrollHeight;
 }
@@ -1193,7 +1323,7 @@ function appendBubble(container, type, text) {
     wrap.innerHTML = `<div class="bubble user">${escHtml(text)}</div>`;
   } else {
     wrap.innerHTML = `<div class="ai-label">Braincast AI</div>
-      <div class="bubble ai">${text.replace(/\n/g, '<br>')}</div>`;
+      <div class="bubble ai">${text.replace(/\n/g,'<br>')}</div>`;
   }
   container.appendChild(wrap);
 }
@@ -1202,23 +1332,23 @@ function appendTyping(container) {
   const wrap = document.createElement('div');
   wrap.innerHTML = `<div class="ai-label">Braincast AI</div>
     <div class="bubble ai"><div class="typing">
-      <div class="typing-dot"></div>
-      <div class="typing-dot"></div>
-      <div class="typing-dot"></div>
+      <div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>
     </div></div>`;
   container.appendChild(wrap);
   return wrap;
 }
 
-// ── Monitor: Add keyword ──
+// ══════════════════════════════
+// MONITOR
+// ══════════════════════════════
 function addMonitor() {
   const kw = prompt('Enter a keyword or topic to monitor:');
-  if (kw && kw.trim()) {
-    showToast(`📡 Now monitoring: "${kw.trim()}"`);
-  }
+  if (kw && kw.trim()) showToast(`📡 Now monitoring: "${kw.trim()}"`);
 }
 
-// ── Toast notification ──
+// ══════════════════════════════
+// TOAST
+// ══════════════════════════════
 let toastTimer;
 function showToast(msg) {
   const t = document.getElementById('toast');
@@ -1228,11 +1358,19 @@ function showToast(msg) {
   toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
 }
 
-// ── Helpers ──
+// ══════════════════════════════
+// HELPERS
+// ══════════════════════════════
 function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
 function escHtml(s) {
-  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
+
+// ══════════════════════════════
+// INIT — load feed on start
+// ══════════════════════════════
+loadFeed();
 
 </script>
 </body>
