@@ -454,7 +454,51 @@ function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrol
 function handleEnter(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendChat();}}
 function sendPrompt(el){document.getElementById('chat-input').value=el.textContent.trim();sendChat();}
 
-async function sendChat(){const input=document.getElementById('chat-input');const text=input.value.trim();if(!text)return;const feed=document.getElementById('chat-messages');appendBubble(feed,'user',text);input.value='';input.style.height='auto';const typingEl=appendTyping(feed);feed.scrollTop=feed.scrollHeight;await delay(1100);typingEl.remove();const headlines=allArticles.slice(0,5).map(a=>`• ${a.title}`).join('\n');const reply=headlines?`Here are the latest headlines from your feed:\n\n${headlines}\n\nAsk me about any of these for a deeper explanation.`:"I'm connected to your live news feed. Full AI answers coming soon!";appendBubble(feed,'ai',reply);feed.scrollTop=feed.scrollHeight;}
+async function sendChat(){
+  const input=document.getElementById('chat-input');
+  const text=input.value.trim();
+  if(!text)return;
+  const feed=document.getElementById('chat-messages');
+  appendBubble(feed,'user',text);
+  input.value='';input.style.height='auto';
+  const typingEl=appendTyping(feed);
+  feed.scrollTop=feed.scrollHeight;
+
+  // Build context from current feed headlines
+  const headlines=allArticles.slice(0,8).map(a=>`• ${a.title} (${a.source})`).join('\n');
+  const systemPrompt=`You are Braincast AI — a smart, concise news assistant. You help users understand current news and world events.
+
+Today's top headlines from the user's feed:
+${headlines}
+
+Guidelines:
+- Be concise but informative (3-5 sentences for most answers)
+- Reference specific headlines when relevant
+- If asked about something not in the headlines, answer from your knowledge
+- Use simple language, no jargon
+- Never say "As an AI" or "I cannot"`;
+
+  try {
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        system:systemPrompt,
+        messages:[{role:'user',content:text}]
+      })
+    });
+    const data=await res.json();
+    typingEl.remove();
+    const reply=data.content?.[0]?.text||'Sorry, I could not get a response. Please try again.';
+    appendBubble(feed,'ai',reply);
+  } catch(e) {
+    typingEl.remove();
+    appendBubble(feed,'ai','Connection error. Please check your internet and try again.');
+  }
+  feed.scrollTop=feed.scrollHeight;
+}
 function appendBubble(c,type,text){const w=document.createElement('div');if(type==='user'){w.style.cssText='display:flex;justify-content:flex-end;';w.innerHTML=`<div class="bubble user">${escHtml(text)}</div>`;}else{w.innerHTML=`<div class="ai-label">Braincast AI</div><div class="bubble ai">${text.replace(/\n/g,'<br>')}</div>`;}c.appendChild(w);}
 function appendTyping(c){const w=document.createElement('div');w.innerHTML=`<div class="ai-label">Braincast AI</div><div class="bubble ai"><div class="typing"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div>`;c.appendChild(w);return w;}
 function addMonitor(){const kw=prompt('Enter a keyword to monitor:');if(kw&&kw.trim())showToast(`📡 Now monitoring: "${kw.trim()}"`);}
