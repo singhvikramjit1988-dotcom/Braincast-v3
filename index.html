@@ -359,32 +359,34 @@ body{background:var(--navy);color:var(--white);font-family:'DM Sans',sans-serif;
 <script>
 const RSS_SOURCES=[
   {url:'https://news.google.com/rss/search?q=world+news&hl=en-IN&gl=IN&ceid=IN:en',cat:'world',label:'Google News',emoji:'🌍'},
+  {url:'https://news.google.com/rss/search?q=international+news&hl=en-IN&gl=IN&ceid=IN:en',cat:'world',label:'Google News',emoji:'🌍'},
   {url:'https://news.google.com/rss/search?q=technology+AI&hl=en-IN&gl=IN&ceid=IN:en',cat:'tech',label:'Google News',emoji:'🤖'},
   {url:'https://news.google.com/rss/search?q=science&hl=en-IN&gl=IN&ceid=IN:en',cat:'science',label:'Google News',emoji:'🔬'},
   {url:'https://news.google.com/rss/search?q=health+medicine&hl=en-IN&gl=IN&ceid=IN:en',cat:'health',label:'Google News',emoji:'💊'},
   {url:'https://news.google.com/rss/search?q=business+economy&hl=en-IN&gl=IN&ceid=IN:en',cat:'business',label:'Google News',emoji:'📈'},
   {url:'https://news.google.com/rss/search?q=india+news&hl=en-IN&gl=IN&ceid=IN:en',cat:'india',label:'Google News',emoji:'🇮🇳'},
+  {url:'https://news.google.com/rss/search?q=india+politics&hl=en-IN&gl=IN&ceid=IN:en',cat:'india',label:'Google News',emoji:'🇮🇳'},
 ];
 let allArticles=[],displayedArticles=[],currentCat='all',currentArticle=null;
 const CAT_EMOJI={world:'🌍',tech:'🤖',science:'🔬',health:'💊',business:'📈',india:'🇮🇳',all:'📰'};
 const FALLBACK_ARTICLES=[
   {title:"India Remains World's Fastest-Growing Major Economy in 2026",summary:"Strong domestic consumption, infrastructure investment and a booming services sector continue to drive India's economic outperformance.",url:'https://economictimes.indiatimes.com',time:new Date(Date.now()-1*3600000).toISOString(),source:'Economic Times',cat:'india',emoji:'🇮🇳'},
   {title:'OpenAI Releases Major Model Update with Improved Reasoning',summary:'The latest release shows significant improvements in multi-step reasoning tasks, coding, and mathematical problem solving.',url:'https://openai.com/news',time:new Date(Date.now()-2*3600000).toISOString(),source:'OpenAI',cat:'tech',emoji:'🤖'},
-  {title:'US-China Trade Tensions Rise Over Semiconductor Export Controls',summary:'New restrictions on advanced chip exports are escalating tensions between Washington and Beijing.',url:'https://reuters.com',time:new Date(Date.now()-3*3600000).toISOString(),source:'Reuters',cat:'world',emoji:'🌍'},
-  {title:'WHO Warns of Rising Antibiotic Resistance Across South Asia',summary:'Drug-resistant infections are increasing at an alarming rate in South Asian countries.',url:'https://who.int',time:new Date(Date.now()-4*3600000).toISOString(),source:'WHO',cat:'health',emoji:'💊'},
-  {title:'Global Stock Markets Rally on Fed Rate Cut Signals',summary:'Equity markets surged worldwide after Federal Reserve minutes suggested policymakers are open to cutting rates.',url:'https://bloomberg.com',time:new Date(Date.now()-5*3600000).toISOString(),source:'Bloomberg',cat:'business',emoji:'📈'},
-  {title:'Scientists Achieve Breakthrough in Room-Temperature Superconductivity',summary:'A research team claims to have created a material that conducts electricity without resistance at near-room temperatures.',url:'https://nature.com',time:new Date(Date.now()-6*3600000).toISOString(),source:'Nature',cat:'science',emoji:'🔬'},
-  {title:'Punjab Farmers Demand Higher MSP Ahead of Kharif Season',summary:'Farmers across Punjab are pushing the government for higher minimum support prices for paddy and kharif crops.',url:'https://thehindu.com',time:new Date(Date.now()-7*3600000).toISOString(),source:'The Hindu',cat:'india',emoji:'🇮🇳'},
-  {title:'Apple Announces Foldable iPhone for Late 2026 Launch',summary:'Apple is reportedly finalising its first foldable iPhone design with mass production expected in Q3 2026.',url:'https://9to5mac.com',time:new Date(Date.now()-8*3600000).toISOString(),source:'9to5Mac',cat:'tech',emoji:'🤖'},
-  {title:'UN Climate Report Warns of Accelerating Arctic Ice Loss',summary:'A new UN report finds Arctic sea ice is declining faster than previous models predicted.',url:'https://un.org',time:new Date(Date.now()-9*3600000).toISOString(),source:'United Nations',cat:'world',emoji:'🌍'},
-  {title:'Ozempic Study Shows Long-Term Cardiovascular Benefits',summary:'A major five-year study confirms semaglutide drugs reduce major cardiac events by 20% beyond weight loss.',url:'https://nejm.org',time:new Date(Date.now()-10*3600000).toISOString(),source:'NEJM',cat:'health',emoji:'💊'},
-  {title:"India's Startup Ecosystem Raises Record $18B in Q1 2026",summary:'Indian startups attracted record venture capital in Q1, led by fintech, SaaS, and deep tech sectors.',url:'https://inc42.com',time:new Date(Date.now()-11*3600000).toISOString(),source:'Inc42',cat:'india',emoji:'🇮🇳'},
-  {title:'SpaceX Starship Completes Sixth Test Flight Successfully',summary:"SpaceX's Starship mega-rocket completed another successful test flight toward NASA's Artemis moon mission.",url:'https://spacex.com',time:new Date(Date.now()-12*3600000).toISOString(),source:'SpaceX',cat:'science',emoji:'🔬'},
+  {title:'US-China Trade Tensions Rise Over Semiconductor Export Controls',summary:'New restrictions on advanced chip exports are escalating tensions between Washington and Beijing.',url:'https://www.reuters.com/technology/us-china-tech-trade/',time:new Date(Date.now()-3*3600000).toISOString(),source:'Reuters',cat:'world',emoji:'🌍'},
+  {title:'WHO Warns of Rising Antibiotic Resistance Across South Asia',summary:'Drug-resistant infections are increasing at an alarming rate in South Asian countries.',url:'https://www.who.int/news/item/antimicrobial-resistance',time:new Date(Date.now()-4*3600000).toISOString(),source:'WHO',cat:'health',emoji:'💊'},
+  {title:'Global Stock Markets Rally on Fed Rate Cut Signals',summary:'Equity markets surged worldwide after Federal Reserve minutes suggested policymakers are open to cutting rates.',url:'https://www.bloomberg.com/markets',time:new Date(Date.now()-5*3600000).toISOString(),source:'Bloomberg',cat:'business',emoji:'📈'},
+  {title:'Scientists Achieve Breakthrough in Room-Temperature Superconductivity',summary:'A research team claims to have created a material that conducts electricity without resistance at near-room temperatures.',url:'https://www.nature.com/articles/superconductivity',time:new Date(Date.now()-6*3600000).toISOString(),source:'Nature',cat:'science',emoji:'🔬'},
+  {title:'Punjab Farmers Demand Higher MSP Ahead of Kharif Season',summary:'Farmers across Punjab are pushing the government for higher minimum support prices for paddy and kharif crops.',url:'https://www.thehindu.com/news/national/',time:new Date(Date.now()-7*3600000).toISOString(),source:'The Hindu',cat:'india',emoji:'🇮🇳'},
+  {title:'Apple Announces Foldable iPhone for Late 2026 Launch',summary:'Apple is reportedly finalising its first foldable iPhone design with mass production expected in Q3 2026.',url:'https://9to5mac.com/guides/iphone/',time:new Date(Date.now()-8*3600000).toISOString(),source:'9to5Mac',cat:'tech',emoji:'🤖'},
+  {title:'UN Climate Report Warns of Accelerating Arctic Ice Loss',summary:'A new UN report finds Arctic sea ice is declining faster than previous models predicted.',url:'https://news.un.org/en/story/climate',time:new Date(Date.now()-9*3600000).toISOString(),source:'United Nations',cat:'world',emoji:'🌍'},
+  {title:'Ozempic Study Shows Long-Term Cardiovascular Benefits',summary:'A major five-year study confirms semaglutide drugs reduce major cardiac events by 20% beyond weight loss.',url:'https://www.nejm.org/medical-research',time:new Date(Date.now()-10*3600000).toISOString(),source:'NEJM',cat:'health',emoji:'💊'},
+  {title:"India's Startup Ecosystem Raises Record $18B in Q1 2026",summary:'Indian startups attracted record venture capital in Q1, led by fintech, SaaS, and deep tech sectors.',url:'https://inc42.com/buzz/',time:new Date(Date.now()-11*3600000).toISOString(),source:'Inc42',cat:'india',emoji:'🇮🇳'},
+  {title:'SpaceX Starship Completes Sixth Test Flight Successfully',summary:"SpaceX's Starship mega-rocket completed another successful test flight toward NASA's Artemis moon mission.",url:'https://www.spacex.com/updates',time:new Date(Date.now()-12*3600000).toISOString(),source:'SpaceX',cat:'science',emoji:'🔬'},
 ];
 
 function timeAgo(d){const s=(Date.now()-new Date(d))/1000;if(s<60)return'just now';if(s<3600)return Math.floor(s/60)+'m ago';if(s<86400)return Math.floor(s/3600)+'h ago';return Math.floor(s/86400)+'d ago';}
 
-function parseXML(xml,src){try{const p=new DOMParser(),doc=p.parseFromString(xml,'text/xml');return Array.from(doc.querySelectorAll('item')).slice(0,8).map(i=>({title:i.querySelector('title')?.textContent||'',summary:(i.querySelector('description')?.textContent||'').replace(/<[^>]+>/g,'').slice(0,200),url:i.querySelector('link')?.textContent||'#',time:i.querySelector('pubDate')?.textContent||'',source:src.label,cat:src.cat,emoji:src.emoji}));}catch(e){return[];}}
+function parseXML(xml,src){try{const p=new DOMParser(),doc=p.parseFromString(xml,'text/xml');return Array.from(doc.querySelectorAll('item')).slice(0,12).map(i=>({title:i.querySelector('title')?.textContent||'',summary:(i.querySelector('description')?.textContent||'').replace(/<[^>]+>/g,'').slice(0,200),url:i.querySelector('link')?.textContent||'#',time:i.querySelector('pubDate')?.textContent||'',source:src.label,cat:src.cat,emoji:src.emoji}));}catch(e){return[];}}
 
 async function fetchFeed(src){try{const r=await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(src.url)}`,{signal:AbortSignal.timeout(6000)});const d=await r.json();if(!d.contents)return[];return parseXML(d.contents,src);}catch(e){return[];}}
 
@@ -415,7 +417,20 @@ async function openArticle(index){
     const res=await fetch(`/api/fetch-article?url=${encodeURIComponent(a.url)}`,{signal:AbortSignal.timeout(10000)});
     const data=await res.json();
     if(data.success&&data.body&&data.body.trim().length>100){
-      contentEl.innerHTML=data.body.split('\n\n').filter(p=>p.trim()).map(p=>`<p>${escHtml(p.trim())}</p>`).join('');
+      // Decode HTML entities from backend before displaying
+      const decoded = data.body
+        .replace(/&#x27;/g,"'").replace(/&#39;/g,"'")
+        .replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>')
+        .replace(/&quot;/g,'"').replace(/&nbsp;/g,' ');
+      // Quality check — if content has too many non-latin chars or looks like nav/homepage, use summary
+      const nonLatin = (decoded.match(/[\u0600-\u06FF\u4E00-\u9FFF\u0400-\u04FF]/g)||[]).length;
+      const totalChars = decoded.replace(/\s/g,'').length;
+      const isGarbage = nonLatin/totalChars > 0.15 || decoded.includes('Welcome to the United Nations') || decoded.includes('©');
+      if(isGarbage){
+        contentEl.textContent = a.summary || 'Tap below to read the full article on the original site.';
+      } else {
+        contentEl.innerHTML = decoded.split('\n\n').filter(p=>p.trim()).map(p=>`<p>${p.trim()}</p>`).join('');
+      }
     }else{
       contentEl.textContent=a.summary||'Tap below to read the full article on the original site.';
     }
