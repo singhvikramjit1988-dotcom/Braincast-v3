@@ -465,37 +465,20 @@ async function sendChat(){
   feed.scrollTop=feed.scrollHeight;
 
   // Build context from current feed headlines
-  const headlines=allArticles.slice(0,8).map(a=>`• ${a.title} (${a.source})`).join('\n');
-  const systemPrompt=`You are Braincast AI — a smart, concise news assistant. You help users understand current news and world events.
-
-Today's top headlines from the user's feed:
-${headlines}
-
-Guidelines:
-- Be concise but informative (3-5 sentences for most answers)
-- Reference specific headlines when relevant
-- If asked about something not in the headlines, answer from your knowledge
-- Use simple language, no jargon
-- Never say "As an AI" or "I cannot"`;
-
   try {
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
+    const headlines=allArticles.slice(0,8).map(a=>`• ${a.title} (${a.source})`).join('\n');
+    const res=await fetch('/api/chat',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:1000,
-        system:systemPrompt,
-        messages:[{role:'user',content:text}]
-      })
+      body:JSON.stringify({ message:text, headlines })
     });
     const data=await res.json();
     typingEl.remove();
-    const reply=data.content?.[0]?.text||'Sorry, I could not get a response. Please try again.';
+    const reply=data.reply||data.error||'Sorry, could not get a response. Please try again.';
     appendBubble(feed,'ai',reply);
   } catch(e) {
     typingEl.remove();
-    appendBubble(feed,'ai','Connection error. Please check your internet and try again.');
+    appendBubble(feed,'ai','Connection error. Please try again.');
   }
   feed.scrollTop=feed.scrollHeight;
 }
